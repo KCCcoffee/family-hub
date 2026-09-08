@@ -1,0 +1,1664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Family Hub</title>
+<meta name="theme-color" content="#F2F1EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161C" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Family Hub">
+<style>:root{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* =====================================================================
+   FAMILY HUB — styles
+   Built around seven mobile-UI ideas:
+   1 Navigation   — one bottom tab bar, 5 tabs max, always under the thumb
+   2 Scale        — one spacing scale, one type scale, 44px tap targets
+   3 Content      — real words and numbers first, decoration last
+   4 One job      — every screen does exactly one thing
+   5 Gestures     — swipe rows, long-press notes, drag the sheet closed
+   6 Dynamism     — the countdown ticks, checks draw, tabs pop, toasts undo
+   7 Empty states — an empty list explains itself and offers the next step
+   Plus two Google services: weather (Weather API) and drive times (Routes API).
+   ===================================================================== */
+
+/* ---------- 2 SCALE: every size in the app comes from these tokens ---------- */
+:root {
+  /* light palette */
+  --bg: #F2F1EC;          /* app ground — warm neutral, leaning toward the marigold accent */
+  --bg-outer: #E4E2DA;    /* ground around the phone column on wide screens */
+  --surface: #FFFFFF;
+  --surface-2: #F7F6F2;
+  --line: #E2E0D8;
+  --ink: #1B1D25;
+  --ink-2: #4A4E5A;
+  --muted: #7A7E8A;
+  --accent: #2C4FD6;      /* cobalt — the one "do something" color */
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E3E8FA;
+  --sun-a: #F7C453;       /* marigold — reserved for the countdown */
+  --sun-b: #F0A92B;
+  --sun-ink: #3E2A00;
+  --sun-cell: rgba(255,255,255,.55);
+  --good: #23935F;  --good-soft: #DCF3E6;
+  --warn: #C8690F;
+  --danger: #D34A3E; --danger-soft: #FBE3E0;
+  --note-1: #FFE9A8; --note-2: #D3F1DF; --note-3: #D6E6FA; --note-4: #FBDCE0; --note-5: #E7DCF7;
+  --shadow: 0 1px 2px rgba(27,29,37,.06), 0 10px 28px rgba(27,29,37,.10);
+  --toast-bg: #1B1D25; --toast-ink: #F2F1EC; --toast-accent: #F7C453;
+
+  /* spacing scale (multiples of 4) */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s7: 32px; --s8: 40px;
+  /* type scale */
+  --t-xs: 12px; --t-sm: 14px; --t-md: 16px; --t-lg: 18px; --t-xl: 22px; --t-2xl: 28px; --t-3xl: 34px;
+  /* shapes and touch */
+  --r: 14px; --r-sm: 10px; --r-lg: 20px;
+  --tap: 44px;
+  --app-w: 430px;
+  /* faces */
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Instrument Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'DM Mono', 'SF Mono', Consolas, 'Liberation Mono', monospace;
+  /* motion */
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --dur: 220ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14161C; --bg-outer: #0D0F13; --surface: #1D2029; --surface-2: #242834; --line: #2F3341;
+    --ink: #F1F1F4; --ink-2: #C4C7D1; --muted: #8F94A2;
+    --accent: #8AA0F5; --accent-ink: #0E1533; --accent-soft: #263058;
+    --sun-a: #5E4614; --sun-b: #7C5A18; --sun-ink: #FFE7A8; --sun-cell: rgba(0,0,0,.28);
+    --good: #4FCB8F; --good-soft: #163A27; --warn: #F19A5A; --danger: #F27F75; --danger-soft: #4A1F1C;
+    --note-1: #4A3D12; --note-2: #173A2A; --note-3: #1B3150; --note-4: #4A2228; --note-5: #33264A;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.45);
+    --toast-bg: #F1F1F4; --toast-ink: #14161C; --toast-accent: #2C4FD6;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161C; --bg-outer: #0D0F13; --surface: #1D2029; --surface-2: #242834; --line: #2F3341;
+  --ink: #F1F1F4; --ink-2: #C4C7D1; --muted: #8F94A2;
+  --accent: #8AA0F5; --accent-ink: #0E1533; --accent-soft: #263058;
+  --sun-a: #5E4614; --sun-b: #7C5A18; --sun-ink: #FFE7A8; --sun-cell: rgba(0,0,0,.28);
+  --good: #4FCB8F; --good-soft: #163A27; --warn: #F19A5A; --danger: #F27F75; --danger-soft: #4A1F1C;
+  --note-1: #4A3D12; --note-2: #173A2A; --note-3: #1B3150; --note-4: #4A2228; --note-5: #33264A;
+  --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.45);
+  --toast-bg: #F1F1F4; --toast-ink: #14161C; --toast-accent: #2C4FD6;
+}
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; }
+body {
+  margin: 0; min-height: 100%;
+  background: var(--bg-outer); color: var(--ink);
+  font-family: var(--font-body); font-size: var(--t-md); line-height: 1.45;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; touch-action: manipulation; }
+h1, h2, h3, p { margin: 0; }
+svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.grow { flex: 1; min-width: 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- 1 NAVIGATION: the phone column, header, tab bar, action button ---------- */
+.app { position: relative; max-width: var(--app-w); margin: 0 auto; min-height: 100vh; min-height: 100dvh; background: var(--bg); display: flex; flex-direction: column; }
+.topbar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s3);
+  padding: calc(var(--s4) + env(safe-area-inset-top, 0px)) var(--s5) var(--s3);
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.topbar .eyebrow { font-size: var(--t-sm); color: var(--muted); font-weight: 500; }
+.topbar h1 { font: 700 var(--t-2xl)/1.1 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+.topbar .sub { font-size: var(--t-sm); color: var(--muted); margin-top: 2px; }
+.iconbtn { width: var(--tap); height: var(--tap); border-radius: 50%; display: inline-grid; place-items: center; color: var(--ink-2); flex: none; }
+.iconbtn:active { background: var(--surface-2); }
+.avstack { display: flex; align-items: center; height: var(--tap); padding: 0 var(--s2); border-radius: 999px; }
+.avstack .av { margin-left: -8px; box-shadow: 0 0 0 2px var(--bg); }
+.avstack .av:first-child { margin-left: 0; }
+
+main { flex: 1; }
+.screen { padding: 0 var(--s4) calc(104px + env(safe-area-inset-bottom, 0px)); }
+.screen.enter { animation: rise var(--dur) var(--ease); }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.tabbar {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 10;
+  width: 100%; max-width: var(--app-w);
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding: var(--s1) 0 calc(var(--s1) + env(safe-area-inset-bottom, 0px));
+}
+.tab { position: relative; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .01em; border-radius: var(--r-sm); }
+.tab .ico { width: 26px; height: 26px; display: grid; place-items: center; }
+.tab.on { color: var(--accent); }
+.tab.on .ico { animation: pop 320ms var(--ease); }
+@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.tab .badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--danger); color: #fff; font: 600 11px/18px var(--font-body); text-align: center; }
+
+.fab {
+  position: fixed; z-index: 9;
+  right: max(var(--s4), calc(50% - var(--app-w) / 2 + var(--s4)));
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink);
+  display: grid; place-items: center; box-shadow: var(--shadow);
+  transition: transform 160ms var(--ease);
+}
+.fab:active { transform: scale(.94); }
+.fab svg.i { width: 28px; height: 28px; stroke-width: 2.2; }
+
+/* ---------- shared pieces ---------- */
+.sec { display: flex; align-items: baseline; justify-content: space-between; margin: var(--s6) 0 var(--s2); }
+.sec h2 { font: 600 var(--t-xs)/1 var(--font-body); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.sec .link { font-size: var(--t-sm); font-weight: 600; color: var(--accent); min-height: 32px; padding: 0 var(--s2); }
+.list { display: flex; flex-direction: column; gap: var(--s2); }
+.av { --c: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--c); color: #fff; font: 700 12px/1 var(--font-body); flex: none; }
+.av.av-lg { width: 40px; height: 40px; font-size: 16px; }
+.avs { display: inline-flex; align-items: center; }
+.avs .av { width: 22px; height: 22px; font-size: 10px; margin-left: -6px; box-shadow: 0 0 0 2px var(--surface); }
+.avs .av:first-child { margin-left: 0; }
+.btn { min-height: var(--tap); padding: 0 var(--s5); border-radius: 999px; font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); transition: transform 120ms var(--ease); }
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-ghost { border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
+.btn-danger { color: var(--danger); background: var(--danger-soft); }
+.btn-sm { min-height: 36px; padding: 0 var(--s4); font-size: var(--t-sm); }
+.chips { display: flex; gap: var(--s2); overflow-x: auto; padding: 2px 0 var(--s2); scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { min-height: 38px; padding: 0 var(--s3) 0 var(--s2); border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: var(--t-sm); font-weight: 500; display: inline-flex; align-items: center; gap: var(--s2); white-space: nowrap; flex: none; }
+.chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip.on .av { box-shadow: 0 0 0 2px var(--bg); }
+.pill { display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border-radius: 999px; font-size: var(--t-xs); font-weight: 600; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.pill.sun { background: var(--sun-a); color: var(--sun-ink); }
+.pill.danger { background: var(--danger-soft); color: var(--danger); }
+.pill.good { background: var(--good-soft); color: var(--good); }
+
+/* ---------- 5 GESTURES: a row is a face that slides over an action underneath ---------- */
+.row { position: relative; border-radius: var(--r-sm); overflow: hidden; background: var(--surface); }
+.row-under { position: absolute; inset: 0; display: flex; align-items: center; padding: 0 var(--s4); font-weight: 600; font-size: var(--t-sm); color: #fff; opacity: 0; }
+.row-under.left { justify-content: flex-start; background: var(--good); }
+.row-under.right { justify-content: flex-end; background: var(--danger); }
+.row.reveal-right .row-under.left, .row.reveal-left .row-under.right { opacity: 1; }
+.row.armed .row-under { font-size: var(--t-md); }
+.row-face {
+  position: relative; display: flex; align-items: center; gap: var(--s3);
+  min-height: 60px; padding: var(--s2) var(--s3); background: var(--surface);
+  touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform 200ms var(--ease);
+}
+.row.swiping .row-face { transition: none; }
+.row-face .title { font-weight: 500; font-size: var(--t-md); line-height: 1.3; overflow-wrap: anywhere; }
+.row-face .meta { display: flex; align-items: center; gap: var(--s2); font-size: 13px; color: var(--muted); margin-top: 3px; }
+.row-face .time { font-size: 13px; color: var(--ink-2); width: 62px; flex: none; }
+.row.done .title { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.row.leaving { animation: leave 220ms var(--ease) forwards; }
+@keyframes leave { to { opacity: 0; transform: translateX(24px); } }
+
+/* the round checkbox — its tick is drawn, not swapped */
+.check { width: var(--tap); height: var(--tap); display: grid; place-items: center; flex: none; }
+.check .box { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--muted); display: grid; place-items: center; transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+.check svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.check svg path { stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset var(--dur) var(--ease) 60ms; }
+.check.on .box { background: var(--good); border-color: var(--good); }
+.check.on svg path { stroke-dashoffset: 0; }
+.pin { color: var(--muted); }
+.pin.on { color: var(--warn); }
+.pin.on svg { fill: currentColor; }
+
+/* ---------- Today ---------- */
+.count { margin-top: var(--s2); background: linear-gradient(135deg, var(--sun-a), var(--sun-b)); color: var(--sun-ink); border-radius: var(--r-lg); padding: var(--s4) var(--s4) var(--s4); box-shadow: var(--shadow); }
+.count .top { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); }
+.count .eyebrow { font-size: var(--t-xs); font-weight: 600; letter-spacing: .09em; text-transform: uppercase; opacity: .8; }
+.count h2 { font: 700 var(--t-xl)/1.15 var(--font-display); margin-top: var(--s1); text-wrap: balance; }
+.count .when { font-size: var(--t-sm); opacity: .85; margin-top: 2px; }
+.count .digits { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s2); margin-top: var(--s4); }
+.count .d { background: var(--sun-cell); border-radius: var(--r-sm); padding: 10px 2px 8px; text-align: center; }
+.count .d b { display: block; font: 500 var(--t-2xl)/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.count .d span { display: block; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .75; margin-top: 4px; }
+.count .now { margin-top: var(--s4); font: 600 var(--t-lg) var(--font-display); }
+.count .pinbtn { color: var(--sun-ink); opacity: .7; }
+.count .pinbtn.on { opacity: 1; }
+.count .pinbtn.on svg { fill: currentColor; }
+.summary { display: flex; align-items: center; gap: var(--s3); width: 100%; text-align: left; min-height: 64px; padding: var(--s3); border-radius: var(--r-sm); background: var(--surface); }
+.summary .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.summary .t { font-weight: 600; }
+.summary .s { font-size: 13px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.summary .chev { color: var(--muted); }
+
+/* ---------- Weather (Google Weather API) ---------- */
+/* The strip sits above the countdown: quiet surface, one glyph, the temperature as the only big number. */
+.wx { display: flex; align-items: center; gap: var(--s3); width: 100%; text-align: left; min-height: 76px; padding: var(--s3); margin-top: var(--s2); border-radius: var(--r); background: var(--surface); }
+.wx .glyph { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.wx .glyph svg.i { width: 30px; height: 30px; }
+.wx .temp { display: block; font: 700 var(--t-3xl)/1 var(--font-display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.wx .cond { display: block; font-size: var(--t-sm); color: var(--ink-2); margin-top: 3px; }
+.wx .side { text-align: right; font-size: 13px; color: var(--muted); line-height: 1.4; flex: none; }
+.wx .side b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.wx .side svg.i { width: 13px; height: 13px; vertical-align: -2px; }
+.wx.wx-empty .temp { font: 600 var(--t-md)/1.3 var(--font-body); letter-spacing: 0; }
+.wx.wx-empty .cond { color: var(--muted); }
+.wx .chev { color: var(--muted); flex: none; }
+/* small weather / drive-time pills that sit in an event's meta row */
+.pill { gap: 4px; }
+.pill svg.i { width: 14px; height: 14px; stroke-width: 2; }
+.pill.wxp { background: var(--accent-soft); color: var(--accent); }
+.pill.drive { background: var(--surface-2); color: var(--ink-2); }
+.pill.drive.sun { background: var(--sun-a); color: var(--sun-ink); }
+.pill.drive.danger { background: var(--danger); color: #fff; }
+.pill.drive.quiet { color: var(--muted); }
+.row-face .meta { flex-wrap: wrap; row-gap: 4px; }
+/* the "leave by" line inside the countdown card */
+.count .drive { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s3); padding: 10px 12px; border-radius: var(--r-sm); background: var(--sun-cell); font-size: var(--t-sm); font-weight: 600; }
+.count .drive svg.i { width: 20px; height: 20px; }
+.count .drive .sub { font-weight: 500; opacity: .8; margin-left: auto; text-align: right; }
+.count .drive.late { background: var(--danger); color: #fff; }
+.count .drive.late .sub { opacity: .9; }
+.count .when .wxin { white-space: nowrap; }
+.count .when .wxin svg.i { width: 14px; height: 14px; vertical-align: -2px; }
+/* the weather detail sheet */
+.wx-hero { display: flex; align-items: center; gap: var(--s4); }
+.wx-hero .glyph { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.wx-hero .glyph svg.i { width: 40px; height: 40px; }
+.wx-hero .big { font: 700 56px/1 var(--font-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wx-hero .txt { font-size: var(--t-md); color: var(--ink-2); margin-top: 4px; }
+.wx-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s2); margin-top: var(--s4); }
+.wx-stats div { background: var(--surface-2); border-radius: var(--r-sm); padding: 10px 4px; text-align: center; }
+.wx-stats b { display: block; font: 600 var(--t-lg)/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.wx-stats span { display: block; font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+.wx-days { margin-top: var(--s4); border-top: 1px solid var(--line); }
+.wx-day { display: grid; grid-template-columns: 82px 28px 1fr auto; align-items: center; gap: var(--s3); min-height: 50px; border-bottom: 1px solid var(--line); font-size: var(--t-sm); }
+.wx-day .dn { font-weight: 600; }
+.wx-day .dn.today { color: var(--accent); }
+.wx-day svg.i { width: 22px; height: 22px; color: var(--ink-2); }
+.wx-day .dc { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wx-day .dc small { color: var(--muted); }
+.wx-day .hl { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.wx-day .hl span { color: var(--muted); font-weight: 500; }
+.wx-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); margin-top: var(--s3); font-size: 12px; color: var(--muted); }
+.wx-foot .link { font-size: 13px; font-weight: 600; color: var(--accent); min-height: 36px; padding: 0 var(--s2); }
+/* the Google settings box on the Family screen */
+.gbox { background: var(--surface); border-radius: var(--r); padding: var(--s3); display: flex; flex-direction: column; gap: var(--s2); }
+.gbox .field { margin-bottom: var(--s1); }
+.gbox .two { display: grid; grid-template-columns: 1fr auto; gap: var(--s2); align-items: stretch; }
+.gbox input.key { font-family: var(--font-mono); font-size: 14px; letter-spacing: .01em; }
+.gstatus { display: flex; align-items: flex-start; gap: var(--s2); font-size: 13px; line-height: 1.4; color: var(--ink-2); padding: var(--s2) var(--s3); border-radius: var(--r-sm); background: var(--surface-2); }
+.gstatus svg.i { width: 18px; height: 18px; margin-top: 1px; }
+.gstatus.ok { color: var(--good); background: var(--good-soft); }
+.gstatus.bad { color: var(--danger); background: var(--danger-soft); }
+.gstatus.busy svg.i { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.hint a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+/* ---------- Calendar ---------- */
+.weeknav { display: flex; align-items: center; justify-content: space-between; margin-top: var(--s2); }
+.weeknav h2 { font: 600 var(--t-lg) var(--font-display); }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--s1); touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.day { min-height: 66px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 0; color: var(--ink-2); }
+.day .wd { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; opacity: .8; }
+.day .num { font: 600 var(--t-lg)/1 var(--font-display); }
+.day .dots { display: flex; gap: 3px; height: 5px; }
+.day .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--dc, var(--accent)); }
+.day.today .num { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.day.sel { background: var(--accent); color: var(--accent-ink); }
+.day.sel .dots i { background: currentColor; }
+.daylbl { font-size: 13px; font-weight: 600; color: var(--muted); padding: 0 4px 4px; }
+.week.slide-left { animation: slideL var(--dur) var(--ease); }
+.week.slide-right { animation: slideR var(--dur) var(--ease); }
+@keyframes slideL { from { opacity: 0; transform: translateX(24px); } }
+@keyframes slideR { from { opacity: 0; transform: translateX(-24px); } }
+
+/* ---------- Grocery ---------- */
+.quickadd { display: flex; gap: var(--s2); margin-top: var(--s2); }
+.quickadd input { flex: 1; min-width: 0; }
+.quickadd .qty { width: 72px; flex: none; }
+.quickadd button { width: 48px; flex: none; border-radius: 12px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
+
+/* ---------- Board ---------- */
+.note { --nc: var(--note-1); }
+.note .row-face { display: block; background: var(--nc); padding: var(--s4); min-height: 0; }
+.note .txt { font-size: var(--t-md); line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.note .foot { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s3); font-size: 13px; color: var(--ink-2); }
+.note .foot .who { font-weight: 600; }
+.note .foot .pin { margin-left: auto; width: 36px; height: 36px; }
+
+/* ---------- Family ---------- */
+.member { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "av name x" "sw sw sw"; align-items: center; gap: var(--s2) var(--s3); padding: var(--s3); background: var(--surface); border-radius: var(--r-sm); }
+.member .av { grid-area: av; }
+.member input { grid-area: name; min-width: 0; }
+.member .iconbtn { grid-area: x; }
+.swatches { grid-area: sw; display: flex; gap: var(--s2); padding-left: 52px; }
+.swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; }
+.swatch.on { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--surface); }
+.stack { display: flex; flex-direction: column; gap: var(--s2); }
+.danger-zone { border: 1px dashed var(--line); border-radius: var(--r); padding: var(--s3); display: flex; flex-direction: column; gap: var(--s2); }
+.danger-zone p { font-size: 13px; color: var(--muted); }
+
+/* ---------- 7 EMPTY STATES ---------- */
+.empty { text-align: center; padding: var(--s7) var(--s4) var(--s6); }
+.empty .glyph { width: 56px; height: 56px; margin: 0 auto; border-radius: 18px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.empty h3 { font: 600 var(--t-lg) var(--font-display); margin-top: var(--s3); text-wrap: balance; }
+.empty p { color: var(--muted); font-size: var(--t-sm); max-width: 30ch; margin: var(--s1) auto var(--s4); }
+.empty.quiet { padding: var(--s5) var(--s4); }
+.empty.quiet .glyph { width: 40px; height: 40px; border-radius: 12px; }
+
+/* ---------- forms in the sheet ---------- */
+.sheet-wrap { position: fixed; inset: 0; z-index: 20; }
+.backdrop { position: absolute; inset: 0; background: rgba(10,12,20,.45); opacity: 0; transition: opacity var(--dur) var(--ease); }
+.sheet {
+  position: absolute; bottom: 0; left: 50%; width: 100%; max-width: var(--app-w);
+  max-height: 90vh; max-height: 90dvh; overflow-y: auto;
+  background: var(--surface); border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: 0 var(--s5) calc(var(--s5) + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 104%); transition: transform 260ms var(--ease);
+  box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+}
+.sheet-wrap.open .backdrop { opacity: 1; }
+.sheet-wrap.open .sheet { transform: translate(-50%, 0); }
+.sheet.dragging { transition: none; }
+.handle { position: sticky; top: 0; z-index: 1; padding: 10px 0 6px; background: var(--surface); touch-action: none; cursor: grab; }
+.handle i { display: block; width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto; }
+.sheet h2 { font: 700 var(--t-xl) var(--font-display); margin: var(--s2) 0 var(--s4); }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--s4); }
+.field > label, .field .lbl { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.field .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); }
+input[type="text"], input[type="date"], input[type="time"], select, textarea {
+  width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+  font-size: 16px; /* 16px stops phones from zooming into the field */
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
+.who { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.who .chip { padding: 0 var(--s3) 0 6px; }
+.switch { display: flex; align-items: center; gap: var(--s3); min-height: var(--tap); cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch .knob { width: 46px; height: 28px; border-radius: 999px; background: var(--line); position: relative; transition: background var(--dur) var(--ease); flex: none; }
+.switch .knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform var(--dur) var(--ease); }
+.switch input:checked + .knob { background: var(--accent); }
+.switch input:checked + .knob::after { transform: translateX(18px); }
+.switch input:focus-visible + .knob { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sheet .actions { display: flex; gap: var(--s2); margin-top: var(--s2); }
+.sheet .actions .btn { flex: 1; }
+.colorpick { display: flex; gap: var(--s2); }
+.colorpick button { width: 36px; height: 36px; border-radius: 50%; border: 2px solid transparent; }
+.colorpick button.on { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--surface); }
+
+/* ---------- 6 DYNAMISM: toast ---------- */
+.toast {
+  position: fixed; z-index: 30; left: 50%; transform: translate(-50%, 20px);
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  width: calc(100% - 32px); max-width: calc(var(--app-w) - 32px);
+  display: flex; align-items: center; gap: var(--s3);
+  padding: var(--s3) var(--s4); border-radius: var(--r);
+  background: var(--toast-bg); color: var(--toast-ink); font-weight: 500; font-size: 15px;
+  box-shadow: var(--shadow); opacity: 0; transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast .undo { margin-left: auto; min-height: 36px; padding: 0 var(--s3); border-radius: 999px; font-weight: 700; color: var(--toast-accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<!-- icon sprite: every icon in the app is one of these symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 9.5"/></symbol>
+  <symbol id="i-basket" viewBox="0 0 24 24"><path d="M3 10h18l-1.7 8.6a2 2 0 0 1-2 1.6H6.7a2 2 0 0 1-2-1.6L3 10zM8 10l3-6M16 10l-3-6M9.5 14v3M14.5 14v3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5M8 3h8l-1 6 3 3H6l3-3z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M17.5 13.5a6.5 6.5 0 0 1 4 6.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4M3 11V8a2 2 0 0 1 2-2h16M7 22l-4-4 4-4M21 13v3a2 2 0 0 1-2 2H3"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <!-- weather + driving icons (one per kind of sky the Weather API reports) -->
+  <symbol id="i-wx-moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></symbol>
+  <symbol id="i-wx-cloud" viewBox="0 0 24 24"><path d="M7.5 19h9.5a4 4 0 0 0 .6-7.95A6.5 6.5 0 0 0 5.2 12.3 3.5 3.5 0 0 0 7.5 19z"/></symbol>
+  <symbol id="i-wx-partly" viewBox="0 0 24 24"><path d="M9 3v1.6M3.8 5.6l1.1 1.1M2.5 11.5h1.6M14.2 5.6l-1.1 1.1"/><path d="M5.9 12.2a3.8 3.8 0 0 1 6.5-3.6"/><path d="M9 20h8.5a3.5 3.5 0 0 0 .5-6.96A5.5 5.5 0 0 0 7.3 14.3 3 3 0 0 0 9 20z"/></symbol>
+  <symbol id="i-wx-partly-night" viewBox="0 0 24 24"><path d="M11.5 9.2a4.2 4.2 0 0 1-5.6-5.6 4.2 4.2 0 1 0 5.6 5.6z"/><path d="M9 20h8.5a3.5 3.5 0 0 0 .5-6.96A5.5 5.5 0 0 0 7.3 14.3 3 3 0 0 0 9 20z"/></symbol>
+  <symbol id="i-wx-rain" viewBox="0 0 24 24"><path d="M7.5 15h9.5a4 4 0 0 0 .6-7.95A6.5 6.5 0 0 0 5.2 8.3 3.5 3.5 0 0 0 7.5 15z"/><path d="M8 18v3M12 17v4M16 18v3"/></symbol>
+  <symbol id="i-wx-snow" viewBox="0 0 24 24"><path d="M7.5 15h9.5a4 4 0 0 0 .6-7.95A6.5 6.5 0 0 0 5.2 8.3 3.5 3.5 0 0 0 7.5 15z"/><path d="M8 18.5h.01M12 18h.01M16 18.5h.01M10 21.5h.01M14 21.5h.01"/></symbol>
+  <symbol id="i-wx-storm" viewBox="0 0 24 24"><path d="M7.5 14h9.5a4 4 0 0 0 .6-7.95A6.5 6.5 0 0 0 5.2 7.3 3.5 3.5 0 0 0 7.5 14z"/><path d="M12.5 12.5 10 17h4l-2.5 5"/></symbol>
+  <symbol id="i-wx-wind" viewBox="0 0 24 24"><path d="M3 8h10.5a2.5 2.5 0 1 0-2.5-2.5M3 12h15a2.5 2.5 0 1 1-2.5 2.5M3 16h8.5a2 2 0 1 1-2 2"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s-6 6.6-6 11a6 6 0 0 0 12 0c0-4.4-6-11-6-11z"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-3.4L6.3 8h11.4L20 12.6V16M4 16h16M4 16v2.5h3V16M17 16v2.5h3V16M7.5 12.5h.01M16.5 12.5h.01"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3.5 11 20.5 3.5 13 20.5l-2-7.5z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8 20 3M16 7l2.5 2.5M13.5 9.5 16 12"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3zM12 10v4M12 17.5h.01"/></symbol>
+  <symbol id="i-loader" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 1-6.4 2.6"/></symbol>
+</svg>
+
+<div class="app" id="app">
+  <header class="topbar" id="topbar"></header>
+  <main>
+    <section class="screen" id="screen-today"></section>
+    <section class="screen" id="screen-calendar" hidden></section>
+    <section class="screen" id="screen-chores" hidden></section>
+    <section class="screen" id="screen-grocery" hidden></section>
+    <section class="screen" id="screen-board" hidden></section>
+    <section class="screen" id="screen-family" hidden></section>
+  </main>
+</div>
+
+<button class="fab" id="fab" aria-label="Add" hidden><svg class="i"><use href="#i-plus"/></svg></button>
+
+<nav class="tabbar" id="tabbar" aria-label="Main sections">
+  <button class="tab on" data-tab="today" aria-current="page"><span class="ico"><svg class="i"><use href="#i-home"/></svg></span>Today</button>
+  <button class="tab" data-tab="calendar"><span class="ico"><svg class="i"><use href="#i-cal"/></svg></span>Calendar</button>
+  <button class="tab" data-tab="chores"><span class="ico"><svg class="i"><use href="#i-check-circle"/></svg></span>Chores<span class="badge" id="badge-chores" hidden></span></button>
+  <button class="tab" data-tab="grocery"><span class="ico"><svg class="i"><use href="#i-basket"/></svg></span>Grocery<span class="badge" id="badge-grocery" hidden></span></button>
+  <button class="tab" data-tab="board"><span class="ico"><svg class="i"><use href="#i-pin"/></svg></span>Board</button>
+</nav>
+
+<div class="sheet-wrap" id="sheetWrap" hidden>
+  <div class="backdrop" id="backdrop"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="handle" id="handle"><i></i></div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   FAMILY HUB — the code, in the order things happen
+   1. Data & saving   — what the app remembers (members, events, chores, grocery, notes)
+   2. Helpers         — small functions for dates, ids and safe text
+   3. Navigation      — the tab bar and switching screens
+   4. Screens         — one "render" function per screen
+   5. Sheets          — the slide-up form for adding and editing
+   6. Gestures        — swipe, long-press and drag-to-close
+   7. Dynamism        — the ticking countdown, toasts with Undo, haptics
+   8. Google services — weather (Weather API) and drive times (Routes API)
+   9. Boot            — wiring it all together when the page opens
+   ===================================================================== */
+
+/* ---------- 1. DATA & SAVING ---------- */
+const STORAGE_KEY = 'familyhub.v1';                       // where the phone keeps this app's data
+const MEMBER_COLORS = ['#2C4FD6', '#E4572E', '#23935F', '#8E44AD', '#1B9AAA', '#B9820E'];
+const NOTE_COLORS = ['note-1', 'note-2', 'note-3', 'note-4', 'note-5'];
+
+function uid() { return Math.random().toString(36).slice(2, 9); }   // a short random id, e.g. "k3f9x2a"
+function pad(n) { return String(n).padStart(2, '0'); }
+function isoDate(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; } // 2026-09-06
+function today() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+
+// Example data so the app opens looking alive. Dates are relative to "today" the first time it runs.
+function sampleData() {
+  const t = today();
+  const day = n => isoDate(addDays(t, n));
+  const H = 3600e3, D = 86400e3;
+  const maya = uid(), jordan = uid(), ellie = uid(), theo = uid();
+  return {
+    familyName: 'The Riveras',
+    members: [
+      { id: maya,   name: 'Maya',   color: MEMBER_COLORS[0] },
+      { id: jordan, name: 'Jordan', color: MEMBER_COLORS[2] },
+      { id: ellie,  name: 'Ellie',  color: MEMBER_COLORS[3] },
+      { id: theo,   name: 'Theo',   color: MEMBER_COLORS[1] },
+    ],
+    events: [
+      { id: uid(), title: 'Family movie night',        date: day(0),  time: '19:30', who: [maya, jordan, ellie, theo], where: 'Living room' },
+      { id: uid(), title: "Ellie's soccer practice",   date: day(2),  time: '17:30', who: [ellie],        where: 'Lakeside fields', address: 'Lakeshore Park, Knoxville, TN' },
+      { id: uid(), title: 'Theo — dentist',            date: day(5),  time: '09:15', who: [theo, jordan], where: 'Dr. Patel' },
+      { id: uid(), title: "Grandma's birthday dinner", date: day(12), time: '18:00', who: [maya, jordan, ellie, theo], where: 'Our place' },
+      { id: uid(), title: 'Parent–teacher night',      date: day(20), time: '18:30', who: [maya, jordan], where: 'Ridgeview Elementary' },
+      { id: uid(), title: 'Fall break starts',         date: day(33), time: '15:00', who: [ellie, theo],  where: '' },
+    ],
+    chores: [
+      { id: uid(), title: 'Take out the recycling',     who: theo,   due: day(0),  repeat: 'weekly', done: false },
+      { id: uid(), title: 'Empty the dishwasher',       who: ellie,  due: day(0),  repeat: 'daily',  done: false },
+      { id: uid(), title: 'Water the plants',           who: maya,   due: day(1),  repeat: 'weekly', done: false },
+      { id: uid(), title: 'Mow the lawn',               who: jordan, due: day(3),  repeat: 'none',   done: false },
+      { id: uid(), title: 'Clean the guinea pig cage',  who: ellie,  due: day(4),  repeat: 'weekly', done: false },
+      { id: uid(), title: 'Fold the laundry',           who: theo,   due: day(-1), repeat: 'none',   done: true, doneAt: Date.now() - 2 * H },
+    ],
+    grocery: [
+      { id: uid(), name: 'Milk',           qty: '2',     done: false },
+      { id: uid(), name: 'Eggs',           qty: '1 doz', done: false },
+      { id: uid(), name: 'Bananas',        qty: '',      done: false },
+      { id: uid(), name: 'Coffee beans',   qty: '12 oz', done: false },
+      { id: uid(), name: 'Bread',          qty: '',      done: false },
+      { id: uid(), name: 'Chicken thighs', qty: '2 lb',  done: false },
+      { id: uid(), name: 'Spinach',        qty: '',      done: false },
+      { id: uid(), name: 'Dish soap',      qty: '',      done: true },
+      { id: uid(), name: 'Apples',         qty: '6',     done: true },
+    ],
+    notes: [
+      { id: uid(), text: 'Grandma is visiting Sunday — the guest room needs fresh sheets.', who: maya,   color: 'note-1', at: Date.now() - 2 * H,  pinned: true },
+      { id: uid(), text: 'Dinners this week\nMon tacos · Tue pasta · Wed leftovers · Thu breakfast-for-dinner', who: jordan, color: 'note-2', at: Date.now() - 26 * H, pinned: false },
+      { id: uid(), text: "Theo's library books are due Friday. They're on the hall table.", who: jordan, color: 'note-3', at: Date.now() - 3 * D,  pinned: false },
+    ],
+    featuredEventId: null,   // which event the countdown follows; null = the next one coming up
+  };
+}
+
+let state = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { const s = JSON.parse(raw); if (s && Array.isArray(s.members)) return s; }
+  } catch (e) { /* storage can be unavailable (private mode) — fall through to sample data */ }
+  return sampleData();
+}
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* nothing to do — the app still works for this visit */ }
+}
+
+/* ---------- 2. HELPERS ---------- */
+const WD  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const WDS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MOS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+// Text typed by people goes through esc() before it is put into HTML, so "<" can't break the page.
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const member = id => state.members.find(m => m.id === id);
+const icon = name => `<svg class="i" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+
+function avatar(id, cls = '') {
+  const m = member(id);
+  if (!m) return '';
+  return `<span class="av ${cls}" style="--c:${m.color}" title="${esc(m.name)}">${esc((m.name.trim()[0] || '?').toUpperCase())}</span>`;
+}
+function avatars(ids) { return `<span class="avs">${(ids || []).map(id => avatar(id)).join('')}</span>`; }
+function parseDT(date, time) {           // "2026-09-06" + "17:30" -> a real Date in local time
+  const [y, mo, d] = date.split('-').map(Number);
+  const [h, mi] = (time || '00:00').split(':').map(Number);
+  return new Date(y, mo - 1, d, h || 0, mi || 0);
+}
+function daysFromToday(date) { return Math.round((parseDT(date) - today()) / 86400e3); }
+function dayLabel(date) {                // "Today", "Tomorrow", "Thursday", "Sep 18"
+  const diff = daysFromToday(date), d = parseDT(date);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  if (diff === -1) return 'Yesterday';
+  if (diff > 1 && diff < 7) return WD[d.getDay()];
+  return `${MOS[d.getMonth()]} ${d.getDate()}`;
+}
+function longDate(date) { const d = parseDT(date); return `${WD[d.getDay()]}, ${MOS[d.getMonth()]} ${d.getDate()}`; }
+function timeLabel(time) {               // "17:30" -> "5:30 PM"
+  if (!time) return '';
+  let [h, m] = time.split(':').map(Number);
+  const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  return `${h}:${pad(m)} ${ap}`;
+}
+function clock(ms) {                     // a timestamp -> "5:05 PM"
+  const d = new Date(ms);
+  return timeLabel(`${d.getHours()}:${pad(d.getMinutes())}`);
+}
+function inLabel(ms) {                   // how far away something is: "in 3d 4h", "in 25m", "now"
+  if (ms < -3600e3) return 'earlier';
+  if (ms < 0) return 'now';
+  const d = Math.floor(ms / 86400e3), h = Math.floor(ms % 86400e3 / 3600e3), m = Math.floor(ms % 3600e3 / 60e3);
+  if (d > 0) return `in ${d}d ${h}h`;
+  if (h > 0) return `in ${h}h ${m}m`;
+  return `in ${Math.max(1, m)}m`;
+}
+function ago(ts) {                       // "just now", "5m ago", "2h ago", "3d ago"
+  const s = (Date.now() - ts) / 1000;
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+function sortedEvents() {
+  return state.events.map(e => ({ ...e, at: parseDT(e.date, e.time) })).sort((a, b) => a.at - b.at);
+}
+// The event the big countdown follows: a pinned one if it is still relevant, otherwise the next one up.
+function featuredEvent() {
+  const cutoff = Date.now() - 3600e3;    // an event counts as "happening" for an hour after it starts
+  const list = sortedEvents();
+  const pinned = list.find(e => e.id === state.featuredEventId && e.at.getTime() > cutoff);
+  return pinned || list.find(e => e.at.getTime() > cutoff) || null;
+}
+function startOfWeek(d) { const x = new Date(d); x.setDate(x.getDate() - x.getDay()); x.setHours(0, 0, 0, 0); return x; }
+function greeting() { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; }
+
+/* ---------- 3. NAVIGATION ---------- */
+const $ = sel => document.querySelector(sel);
+let current = 'today';                      // which screen is showing
+let calSel = isoDate(today());              // the day picked on the calendar
+let calWeek = startOfWeek(today());         // the first day (Sunday) of the week on show
+let choreFilter = 'all';                    // "all" or a member id
+const FAB_ACTIONS = { calendar: () => openSheet('event'), chores: () => openSheet('chore'), board: () => openSheet('note') };
+
+function setTab(name) {
+  current = name;
+  document.querySelectorAll('.screen').forEach(s => { s.hidden = s.id !== 'screen-' + name; });
+  document.querySelectorAll('.tab').forEach(b => {
+    const on = b.dataset.tab === name;
+    b.classList.toggle('on', on);
+    if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
+  window.scrollTo(0, 0);
+  render();
+  const s = $('#screen-' + name);
+  s.classList.remove('enter'); void s.offsetWidth; s.classList.add('enter');
+}
+
+function render() {
+  renderTopbar();
+  ({ today: renderToday, calendar: renderCalendar, chores: renderChores, grocery: renderGrocery, board: renderBoard, family: renderFamily })[current]();
+  renderBadges();
+  $('#fab').hidden = !FAB_ACTIONS[current];
+  const labels = { calendar: 'Add an event', chores: 'Add a chore', board: 'Add a note' };
+  $('#fab').setAttribute('aria-label', labels[current] || 'Add');
+}
+function renderBadges() {
+  const t = isoDate(today());
+  const due = state.chores.filter(c => !c.done && c.due <= t).length;
+  const buy = state.grocery.filter(g => !g.done).length;
+  const b1 = $('#badge-chores'), b2 = $('#badge-grocery');
+  b1.hidden = !due; b1.textContent = due;
+  b2.hidden = !buy; b2.textContent = buy;
+}
+function renderTopbar() {
+  const t = today();
+  const tb = $('#topbar');
+  const back = `<button class="iconbtn" data-act="tab" data-tab="today" aria-label="Back to Today">${icon('left')}</button>`;
+  if (current === 'today') {
+    const stack = state.members.slice(0, 4).map(m => avatar(m.id)).join('');
+    tb.innerHTML = `<div><p class="eyebrow">${esc(state.familyName || 'Family Hub')} · ${WD[t.getDay()]}, ${MOS[t.getMonth()]} ${t.getDate()}</p><h1>${greeting()}</h1></div>
+      <button class="avstack" data-act="tab" data-tab="family" aria-label="Family settings">${stack || icon('users')}</button>`;
+  } else if (current === 'calendar') {
+    const n = state.events.filter(e => { const d = daysFromToday(e.date); return d >= 0 && d < 7; }).length;
+    tb.innerHTML = `<div><h1>Calendar</h1><p class="sub">${n ? `${n} event${n === 1 ? '' : 's'} in the next 7 days` : 'Nothing in the next 7 days'}</p></div>
+      <button class="btn btn-ghost btn-sm" data-act="week-today">Today</button>`;
+  } else if (current === 'chores') {
+    const ts = isoDate(t);
+    const over = state.chores.filter(c => !c.done && c.due < ts).length;
+    const dueToday = state.chores.filter(c => !c.done && c.due === ts).length;
+    const bits = [dueToday ? `${dueToday} due today` : 'Nothing due today', over ? `${over} overdue` : ''].filter(Boolean).join(' · ');
+    tb.innerHTML = `<div><h1>Chores</h1><p class="sub">${bits}</p></div>`;
+  } else if (current === 'grocery') {
+    const buy = state.grocery.filter(g => !g.done).length, cart = state.grocery.length - buy;
+    tb.innerHTML = `<div><h1>Grocery</h1><p class="sub">${buy ? `${buy} to buy` : 'Nothing to buy'}${cart ? ` · ${cart} in the cart` : ''}</p></div>`;
+  } else if (current === 'board') {
+    const n = state.notes.length;
+    tb.innerHTML = `<div><h1>Board</h1><p class="sub">${n ? `${n} note${n === 1 ? '' : 's'}` : 'No notes yet'}</p></div>`;
+  } else if (current === 'family') {
+    tb.innerHTML = `<div style="display:flex;align-items:center;gap:4px;margin-left:-12px">${back}<h1>Family</h1></div>`;
+  }
+}
+
+/* ---------- 4. SCREENS ---------- */
+
+// 7 EMPTY STATES: one helper draws every "nothing here yet" so they all feel the same.
+function emptyState({ glyph = 'spark', title, body, action, act = '', extra = '', quiet = false }) {
+  return `<div class="empty${quiet ? ' quiet' : ''}"><div class="glyph">${icon(glyph)}</div><h3>${title}</h3>${body ? `<p>${body}</p>` : ''}${action ? `<button class="btn btn-primary btn-sm" ${act} ${extra}>${action}</button>` : ''}</div>`;
+}
+
+function renderToday() {
+  const ts = isoDate(today());
+  const ev = featuredEvent();
+  const pinned = ev && ev.id === state.featuredEventId;
+  let count;
+  if (ev) {
+    const who = ev.who && ev.who.length ? avatars(ev.who) : '';
+    const wx = wxForEvent(ev);   // the forecast for the hour of the event, if Google has one
+    const wxLine = wx ? ` · <span class="wxin">${icon(wxIcon(wx.type, wx.isDay))} ${Math.round(wx.temp)}° ${esc(wx.text)}</span>` : '';
+    count = `<section class="count" id="countdown" data-target="${ev.at.getTime()}" aria-label="Countdown to ${esc(ev.title)}">
+      <div class="top"><p class="eyebrow">${pinned ? 'Pinned countdown' : 'Next up'}</p>
+        <button class="iconbtn pinbtn pin${pinned ? ' on' : ''}" data-act="pin-event" data-id="${ev.id}" aria-label="${pinned ? 'Unpin this countdown' : 'Pin this countdown'}" aria-pressed="${pinned}">${icon('pin')}</button></div>
+      <h2>${esc(ev.title)}</h2>
+      <p class="when">${longDate(ev.date)} · ${timeLabel(ev.time)}${ev.where ? ` · ${esc(ev.where)}` : ''}${wxLine} ${who}</p>
+      <div class="digits" id="cdDigits">
+        <div class="d"><b id="cd-d">00</b><span>days</span></div>
+        <div class="d"><b id="cd-h">00</b><span>hours</span></div>
+        <div class="d"><b id="cd-m">00</b><span>min</span></div>
+        <div class="d"><b id="cd-s">00</b><span>sec</span></div>
+      </div>
+      <p class="now" id="cdNow" hidden>Happening now</p>
+      ${driveLine(ev)}
+    </section>`;
+  } else {
+    count = `<section class="count" aria-label="Countdown">
+      <p class="eyebrow">Countdown</p>
+      <h2>Nothing to count down to</h2>
+      <p class="when">Add an event and the clock starts here.</p>
+      <div style="margin-top:14px"><button class="btn btn-sm" style="background:var(--sun-cell);color:inherit" data-act="open-sheet" data-kind="event">${icon('plus')} Add an event</button></div>
+    </section>`;
+  }
+
+  // today's agenda = events dated today + chores due (or overdue)
+  const evToday = sortedEvents().filter(e => e.date === ts);
+  const choresDue = state.chores.filter(c => !c.done && c.due <= ts).sort((a, b) => a.due.localeCompare(b.due));
+  let agenda = '';
+  if (!evToday.length && !choresDue.length) {
+    agenda = emptyState({ glyph: 'sun', title: 'A clear day', body: 'No events and no chores due today. Enjoy it.', quiet: true });
+  } else {
+    agenda = `<div class="list">` +
+      evToday.map(e => eventRow(e, { simple: true })).join('') +
+      choresDue.map(c => choreRow(c)).join('') + `</div>`;
+  }
+
+  const buy = state.grocery.filter(g => !g.done);
+  const groceryLine = buy.length ? `${buy.slice(0, 4).map(g => esc(g.name)).join(', ')}${buy.length > 4 ? ` +${buy.length - 4} more` : ''}` : 'The list is clear';
+  const note = [...state.notes].sort((a, b) => (b.pinned - a.pinned) || (b.at - a.at))[0];
+  const noteLine = note ? esc(note.text.split('\n')[0]) : 'Nothing on the board';
+
+  $('#screen-today').innerHTML = `
+    ${weatherStrip()}
+    ${count}
+    <div class="sec"><h2>Today</h2><button class="link" data-act="tab" data-tab="calendar">Calendar</button></div>
+    ${agenda}
+    <div class="sec"><h2>Around the house</h2></div>
+    <div class="list">
+      <button class="summary" data-act="tab" data-tab="grocery"><span class="ico">${icon('basket')}</span><span class="grow"><span class="t" style="display:block">${buy.length ? `${buy.length} thing${buy.length === 1 ? '' : 's'} to buy` : 'Grocery list'}</span><span class="s" style="display:block">${groceryLine}</span></span><span class="chev">${icon('right')}</span></button>
+      <button class="summary" data-act="tab" data-tab="board"><span class="ico">${icon('pin')}</span><span class="grow"><span class="t" style="display:block">${note ? (note.pinned ? 'Pinned on the board' : 'Latest on the board') : 'Family board'}</span><span class="s" style="display:block">${noteLine}</span></span><span class="chev">${icon('right')}</span></button>
+    </div>`;
+  wireRows($('#screen-today'));
+  tickCountdown();
+  syncGoogle();   // fetch weather / drive times if what we have is stale (does nothing without a key)
+}
+
+function eventRow(e, { simple = false } = {}) {
+  const pinned = e.id === state.featuredEventId;
+  const ms = parseDT(e.date, e.time) - Date.now();
+  return `<div class="row" data-swipe data-type="event" data-id="${e.id}">
+    <div class="row-under right">${icon('trash')} Delete</div>
+    <div class="row-face" data-act="open-sheet" data-kind="event" data-id="${e.id}">
+      <div class="time mono">${timeLabel(e.time)}</div>
+      <div class="grow"><div class="title">${esc(e.title)}</div>
+        <div class="meta">${e.who && e.who.length ? avatars(e.who) : ''}${e.where ? `<span>${esc(e.where)}</span>` : ''}${simple ? '' : `<span class="pill${ms < 86400e3 && ms > -3600e3 ? ' sun' : ''}">${inLabel(ms)}</span>`}${wxPill(e)}${drivePill(e)}</div></div>
+      <button class="iconbtn pin${pinned ? ' on' : ''}" data-act="pin-event" data-id="${e.id}" aria-label="${pinned ? 'Unpin from countdown' : 'Pin to countdown'}" aria-pressed="${pinned}">${icon('pin')}</button>
+    </div></div>`;
+}
+function choreRow(c) {
+  const ts = isoDate(today());
+  const overdue = !c.done && c.due < ts;
+  return `<div class="row${c.done ? ' done' : ''}" data-swipe data-type="chore" data-id="${c.id}">
+    <div class="row-under left">${icon('check')} ${c.done ? 'Not done' : 'Done'}</div>
+    <div class="row-under right">${icon('trash')} Delete</div>
+    <div class="row-face">
+      <button class="check${c.done ? ' on' : ''}" data-act="toggle-chore" data-id="${c.id}" role="checkbox" aria-checked="${c.done}" aria-label="Mark ${esc(c.title)} ${c.done ? 'not done' : 'done'}"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span></button>
+      <div class="grow" data-act="open-sheet" data-kind="chore" data-id="${c.id}"><div class="title">${esc(c.title)}</div>
+        <div class="meta">${avatar(c.who)}<span>${esc(member(c.who)?.name || 'Anyone')}</span><span class="pill${overdue ? ' danger' : ''}">${overdue ? 'Overdue · ' : ''}${dayLabel(c.due)}</span>${c.repeat !== 'none' ? `<span title="Repeats ${c.repeat}" style="display:inline-flex;color:var(--muted)"><svg class="i" style="width:14px;height:14px"><use href="#i-repeat"/></svg></span>` : ''}</div></div>
+    </div></div>`;
+}
+
+function renderCalendar() {
+  const t = today(), ts = isoDate(t);
+  const days = [...Array(7)].map((_, i) => addDays(calWeek, i));
+  const selD = parseDT(calSel);
+  const monthLabel = `${MONTHS[selD.getMonth()]} ${selD.getFullYear()}`;
+  const strip = days.map(d => {
+    const iso = isoDate(d);
+    const evs = state.events.filter(e => e.date === iso);
+    const dots = evs.slice(0, 3).map(e => `<i style="--dc:${member((e.who || [])[0])?.color || 'var(--accent)'}"></i>`).join('');
+    return `<button class="day${iso === calSel ? ' sel' : ''}${iso === ts ? ' today' : ''}" data-act="select-day" data-date="${iso}" aria-label="${longDate(iso)}${evs.length ? `, ${evs.length} event${evs.length === 1 ? '' : 's'}` : ''}" aria-pressed="${iso === calSel}"><span class="wd">${WDS[d.getDay()]}</span><span class="num">${d.getDate()}</span><span class="dots">${dots}</span></button>`;
+  }).join('');
+
+  const dayEvents = sortedEvents().filter(e => e.date === calSel);
+  const upcoming = sortedEvents().filter(e => e.date !== calSel && e.at > Date.now()).slice(0, 8);
+  const dayList = dayEvents.length
+    ? `<div class="list">${dayEvents.map(e => eventRow(e)).join('')}</div>`
+    : emptyState({ glyph: 'cal', title: `Nothing on ${dayLabel(calSel) === 'Today' ? 'today' : dayLabel(calSel)}`, body: 'Practices, appointments, birthdays — put them here and everyone sees them.', action: 'Add an event', act: `data-act="open-sheet" data-kind="event" data-date="${calSel}"`, quiet: true });
+
+  $('#screen-calendar').innerHTML = `
+    <div class="weeknav"><button class="iconbtn" data-act="week-prev" aria-label="Previous week">${icon('left')}</button><h2 id="monthLabel">${monthLabel}</h2><button class="iconbtn" data-act="week-next" aria-label="Next week">${icon('right')}</button></div>
+    <div class="week" id="weekStrip">${strip}</div>
+    <div class="sec"><h2>${longDate(calSel)}</h2>${calSel !== ts ? `<button class="link" data-act="week-today">Back to today</button>` : ''}</div>
+    ${dayList}
+    <div class="sec"><h2>Coming up</h2></div>
+    ${upcoming.length ? `<div class="list">${upcoming.map(e => `<div><div class="daylbl">${dayLabel(e.date)}</div>${eventRow(e)}</div>`).join('')}</div>`
+      : emptyState({ glyph: 'clock', title: 'Nothing coming up', body: 'The countdown on Today follows whatever you add next.', quiet: true })}`;
+  wireRows($('#screen-calendar'));
+  enableWeekSwipe($('#weekStrip'));
+  syncGoogle();
+}
+
+function renderChores() {
+  const ts = isoDate(today());
+  const chips = `<div class="chips" role="group" aria-label="Show chores for">
+      <button class="chip${choreFilter === 'all' ? ' on' : ''}" data-act="filter" data-id="all">Everyone</button>
+      ${state.members.map(m => `<button class="chip${choreFilter === m.id ? ' on' : ''}" data-act="filter" data-id="${m.id}">${avatar(m.id)}${esc(m.name)}</button>`).join('')}
+    </div>`;
+  const mine = c => choreFilter === 'all' || c.who === choreFilter;
+  const open = state.chores.filter(c => !c.done && mine(c)).sort((a, b) => a.due.localeCompare(b.due) || a.title.localeCompare(b.title));
+  const done = state.chores.filter(c => c.done && mine(c)).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 12);
+  const who = choreFilter === 'all' ? '' : member(choreFilter)?.name;
+
+  let openHtml;
+  if (open.length) {
+    // group by due day so "today" reads as one block
+    const groups = new Map();
+    open.forEach(c => { const k = c.due < ts ? 'Overdue' : dayLabel(c.due); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(c); });
+    openHtml = [...groups].map(([label, list]) => `<div class="sec" style="margin-top:12px"><h2 ${label === 'Overdue' ? 'style="color:var(--danger)"' : ''}>${label}</h2></div><div class="list">${list.map(choreRow).join('')}</div>`).join('');
+  } else if (state.chores.some(c => mine(c))) {
+    openHtml = emptyState({ glyph: 'spark', title: who ? `${esc(who)} is all caught up` : 'Everything is done', body: 'Nothing left on the list. Add the next chore whenever it comes up.', action: 'Add a chore', act: 'data-act="open-sheet" data-kind="chore"' });
+  } else {
+    openHtml = emptyState({ glyph: 'check-circle', title: 'No chores yet', body: 'Give each job a person and a day. Swipe right when it’s done.', action: 'Add the first chore', act: 'data-act="open-sheet" data-kind="chore"' });
+  }
+  $('#screen-chores').innerHTML = `${chips}${openHtml}
+    ${done.length ? `<div class="sec"><h2>Done</h2><button class="link" data-act="clear-done">Clear</button></div><div class="list">${done.map(choreRow).join('')}</div>` : ''}`;
+  wireRows($('#screen-chores'));
+}
+
+function renderGrocery() {
+  const buy = state.grocery.filter(g => !g.done);
+  const cart = state.grocery.filter(g => g.done);
+  const gRow = g => `<div class="row${g.done ? ' done' : ''}" data-swipe data-type="grocery" data-id="${g.id}">
+      <div class="row-under right">${icon('trash')} Delete</div>
+      <div class="row-face" data-act="toggle-grocery" data-id="${g.id}" role="checkbox" aria-checked="${g.done}" tabindex="0">
+        <span class="check${g.done ? ' on' : ''}" aria-hidden="true"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span></span>
+        <div class="grow"><div class="title">${esc(g.name)}</div></div>${g.qty ? `<span class="pill">${esc(g.qty)}</span>` : ''}
+      </div></div>`;
+  $('#screen-grocery').innerHTML = `
+    <form class="quickadd" id="quickAdd" autocomplete="off">
+      <input type="text" name="name" placeholder="Add an item…" aria-label="Item" maxlength="60" required>
+      <input type="text" name="qty" class="qty" placeholder="Qty" aria-label="Quantity" maxlength="10">
+      <button type="submit" aria-label="Add to list">${icon('plus')}</button>
+    </form>
+    ${buy.length ? `<div class="sec"><h2>To buy</h2></div><div class="list">${buy.map(gRow).join('')}</div>`
+      : (cart.length ? emptyState({ glyph: 'check-circle', title: 'Everything is in the cart', body: 'Nice. Clear the checked items when you’re home, or add the next thing you run out of.', quiet: true })
+                     : emptyState({ glyph: 'basket', title: 'The list is empty', body: 'Type what you’re out of. Tap an item at the store to check it off.' }))}
+    ${cart.length ? `<div class="sec"><h2>In the cart</h2><button class="link" data-act="clear-cart">Clear ${cart.length}</button></div><div class="list">${cart.map(gRow).join('')}</div>` : ''}`;
+  wireRows($('#screen-grocery'));
+  $('#quickAdd').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target, name = f.name.value.trim(), qty = f.qty.value.trim();
+    if (!name) return;
+    state.grocery.unshift({ id: uid(), name, qty, done: false });
+    save(); haptic(8); render();
+    const input = $('#quickAdd input[name=name]'); if (input) input.focus();
+  });
+}
+
+function renderBoard() {
+  const notes = [...state.notes].sort((a, b) => (b.pinned - a.pinned) || (b.at - a.at));
+  const nRow = n => `<div class="row note" style="--nc:var(--${n.color || 'note-1'})" data-swipe data-type="note" data-id="${n.id}" data-longpress>
+      <div class="row-under right">${icon('trash')} Delete</div>
+      <div class="row-face" data-act="open-sheet" data-kind="note" data-id="${n.id}">
+        <p class="txt">${esc(n.text)}</p>
+        <div class="foot">${avatar(n.who)}<span class="who">${esc(member(n.who)?.name || 'Someone')}</span><span>· ${ago(n.at)}</span>
+          <button class="iconbtn pin${n.pinned ? ' on' : ''}" data-act="pin-note" data-id="${n.id}" aria-label="${n.pinned ? 'Unpin note' : 'Pin note to top'}" aria-pressed="${n.pinned}">${icon('pin')}</button></div>
+      </div></div>`;
+  $('#screen-board').innerHTML = notes.length
+    ? `<div class="list" style="margin-top:8px">${notes.map(nRow).join('')}</div>`
+    : emptyState({ glyph: 'pin', title: 'The board is blank', body: 'Reminders, plans, "we’re out of…" — anything the whole house should see.', action: 'Pin the first note', act: 'data-act="open-sheet" data-kind="note"' });
+  wireRows($('#screen-board'));
+}
+
+function renderFamily() {
+  const rows = state.members.map(m => `<div class="member" data-id="${m.id}">
+      ${avatar(m.id, 'av-lg')}
+      <input type="text" value="${esc(m.name)}" data-field="memberName" data-id="${m.id}" aria-label="Name" maxlength="24">
+      <div class="swatches" role="group" aria-label="Color">${MEMBER_COLORS.map(c => `<button class="swatch${m.color === c ? ' on' : ''}" style="background:${c}" data-act="member-color" data-id="${m.id}" data-color="${c}" aria-label="Color ${c}" aria-pressed="${m.color === c}"></button>`).join('')}</div>
+      <button class="iconbtn" data-act="remove-member" data-id="${m.id}" aria-label="Remove ${esc(m.name)}">${icon('x')}</button>
+    </div>`).join('');
+  $('#screen-family').innerHTML = `
+    <div class="field" style="margin-top:12px"><label for="famName">Family name</label><input type="text" id="famName" value="${esc(state.familyName)}" data-field="familyName" maxlength="40" placeholder="The Smiths"></div>
+    <div class="sec"><h2>Members</h2></div>
+    <div class="stack">${rows || emptyState({ glyph: 'users', title: 'No one here yet', body: 'Add the people in your house so chores and events can be theirs.', quiet: true })}</div>
+    <div style="margin-top:12px"><button class="btn btn-ghost" data-act="add-member">${icon('plus')} Add a member</button></div>
+    <div class="sec"><h2>Weather &amp; drive times</h2></div>
+    <div class="gbox">
+      <div class="field"><label for="gKey">Google API key</label><input type="text" id="gKey" class="key" value="${esc(gset.apiKey)}" data-field="apiKey" placeholder="Paste the key from Google Cloud" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label for="gHome">Home address <span style="font-weight:400;color:var(--muted)">(drives start here)</span></label><input type="text" id="gHome" value="${esc(gset.homeAddress)}" data-field="homeAddress" placeholder="2815 Sutherland Ave, Knoxville, TN" autocomplete="street-address"></div>
+      <div class="field"><label for="gCoords">Weather location <span style="font-weight:400;color:var(--muted)">(latitude, longitude)</span></label>
+        <div class="two"><input type="text" id="gCoords" value="${hasLoc() ? `${gset.lat}, ${gset.lng}` : ''}" data-field="homeCoords" placeholder="35.9606, -83.9207" inputmode="decimal" autocomplete="off"><button class="btn btn-ghost" data-act="use-location">${icon('nav')} Use my location</button></div></div>
+      <label class="switch"><input type="checkbox" data-field="unitsC" ${gset.units === 'C' ? 'checked' : ''}><span class="knob"></span><span>Show °C and km instead of °F and miles</span></label>
+      <div class="gstatus" id="gStatus"></div>
+      <button class="btn btn-ghost" data-act="test-google">Test the connection</button>
+      <p class="hint">Drive times need the home address and an address on the event. Weather needs the location. The key is kept on this device only and is never sent anywhere but Google.</p>
+    </div>
+    <div class="sec"><h2>Data</h2></div>
+    <div class="danger-zone">
+      <p>Everything is saved on this device only. Resetting puts back the example data; clearing empties the app.</p>
+      <button class="btn btn-ghost" data-act="reset" data-confirm="Tap again to reset">Reset to example data</button>
+      <button class="btn btn-danger" data-act="wipe" data-confirm="Tap again to clear everything">Clear all data</button>
+    </div>`;
+  updateGStatus();
+}
+/* ---------- 5. SHEETS: one slide-up form per job (add/edit an event, chore or note) ---------- */
+let sheetKind = null, sheetId = null;
+
+function whoChips(name, selected, { multi = false } = {}) {
+  return `<div class="who" role="group" aria-label="Who">${state.members.map(m => {
+    const on = multi ? selected.includes(m.id) : selected === m.id;
+    return `<button type="button" class="chip${on ? ' on' : ''}" data-who="${m.id}" aria-pressed="${on}">${avatar(m.id)}${esc(m.name)}</button>`;
+  }).join('')}<input type="hidden" name="${name}" value="${multi ? selected.join(',') : (selected || '')}"></div>`;
+}
+
+function openSheet(kind, id = null, presets = {}) {
+  sheetKind = kind; sheetId = id;
+  const body = $('#sheetBody');
+  let html = '';
+  if (kind === 'event') {
+    const e = id ? state.events.find(x => x.id === id) : null;
+    const v = { title: '', date: presets.date || (current === 'calendar' ? calSel : isoDate(today())), time: '18:00', who: [], where: '', address: '', ...(e || {}) };
+    html = `<h2 id="sheetTitle">${e ? 'Edit event' : 'New event'}</h2>
+      <form id="sheetForm">
+        <div class="field"><label for="f-title">What</label><input id="f-title" type="text" name="title" value="${esc(v.title)}" placeholder="Soccer practice" maxlength="60" required></div>
+        <div class="field"><span class="lbl">When</span><div class="two"><input type="date" name="date" value="${v.date}" aria-label="Date" required><input type="time" name="time" value="${v.time}" aria-label="Time"></div></div>
+        <div class="field"><span class="lbl">Who</span>${whoChips('who', v.who || [], { multi: true })}</div>
+        <div class="field"><label for="f-where">Where <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="f-where" type="text" name="where" value="${esc(v.where || '')}" placeholder="Lakeside fields" maxlength="40"></div>
+        <div class="field"><label for="f-address">Address <span style="font-weight:400;color:var(--muted)">(optional · turns on the drive time)</span></label><input id="f-address" type="text" name="address" value="${esc(v.address || '')}" placeholder="1500 Lakeshore Dr, Knoxville, TN" maxlength="120" autocomplete="off"></div>
+        <label class="switch"><input type="checkbox" name="pinned" ${e && state.featuredEventId === e.id ? 'checked' : ''}><span class="knob"></span><span>Feature in the countdown on Today</span></label>
+        <div class="actions">${e ? `<button type="button" class="btn btn-danger" data-act="sheet-delete">Delete</button>` : ''}<button type="submit" class="btn btn-primary">${e ? 'Save' : 'Add event'}</button></div>
+      </form>`;
+  } else if (kind === 'chore') {
+    const c = id ? state.chores.find(x => x.id === id) : null;
+    const v = { title: '', who: (choreFilter !== 'all' && choreFilter) || state.members[0]?.id || '', due: isoDate(today()), repeat: 'none', ...(c || {}) };
+    html = `<h2 id="sheetTitle">${c ? 'Edit chore' : 'New chore'}</h2>
+      <form id="sheetForm">
+        <div class="field"><label for="f-title">What</label><input id="f-title" type="text" name="title" value="${esc(v.title)}" placeholder="Empty the dishwasher" maxlength="60" required></div>
+        <div class="field"><span class="lbl">Whose job</span>${whoChips('who', v.who)}</div>
+        <div class="field"><span class="lbl">Due</span><div class="two"><input type="date" name="due" value="${v.due}" aria-label="Due date" required>
+          <select name="repeat" aria-label="Repeats"><option value="none" ${v.repeat === 'none' ? 'selected' : ''}>Once</option><option value="daily" ${v.repeat === 'daily' ? 'selected' : ''}>Every day</option><option value="weekly" ${v.repeat === 'weekly' ? 'selected' : ''}>Every week</option></select></div></div>
+        <div class="actions">${c ? `<button type="button" class="btn btn-danger" data-act="sheet-delete">Delete</button>` : ''}<button type="submit" class="btn btn-primary">${c ? 'Save' : 'Add chore'}</button></div>
+      </form>`;
+  } else if (kind === 'note') {
+    const n = id ? state.notes.find(x => x.id === id) : null;
+    const v = { text: '', who: state.members[0]?.id || '', color: NOTE_COLORS[state.notes.length % NOTE_COLORS.length], pinned: false, ...(n || {}) };
+    html = `<h2 id="sheetTitle">${n ? 'Edit note' : 'New note'}</h2>
+      <form id="sheetForm">
+        <div class="field"><label for="f-text">Note</label><textarea id="f-text" name="text" placeholder="Grandma's visiting Sunday…" maxlength="280" required>${esc(v.text)}</textarea></div>
+        <div class="field"><span class="lbl">From</span>${whoChips('who', v.who)}</div>
+        <div class="field"><span class="lbl">Color</span><div class="colorpick" role="group" aria-label="Note color">${NOTE_COLORS.map(c => `<button type="button" class="${v.color === c ? 'on' : ''}" style="background:var(--${c})" data-color="${c}" aria-label="${c}" aria-pressed="${v.color === c}"></button>`).join('')}<input type="hidden" name="color" value="${v.color}"></div></div>
+        <label class="switch"><input type="checkbox" name="pinned" ${v.pinned ? 'checked' : ''}><span class="knob"></span><span>Keep at the top of the board</span></label>
+        <div class="actions">${n ? `<button type="button" class="btn btn-danger" data-act="sheet-delete">Delete</button>` : ''}<button type="submit" class="btn btn-primary">${n ? 'Save' : 'Post note'}</button></div>
+      </form>`;
+  } else if (kind === 'weather') {
+    html = weatherSheet();                 // not a form — a read-only detail view (section 8)
+  }
+  body.innerHTML = html;
+
+  // chips inside the form: tap to pick a person / a color
+  body.querySelectorAll('[data-who]').forEach(b => b.addEventListener('click', () => {
+    const hidden = b.parentElement.querySelector('input[type=hidden]');
+    const multi = kind === 'event';
+    if (multi) {
+      const set = new Set(hidden.value ? hidden.value.split(',') : []);
+      set.has(b.dataset.who) ? set.delete(b.dataset.who) : set.add(b.dataset.who);
+      hidden.value = [...set].join(',');
+      b.classList.toggle('on'); b.setAttribute('aria-pressed', b.classList.contains('on'));
+    } else {
+      hidden.value = b.dataset.who;
+      b.parentElement.querySelectorAll('.chip').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+    }
+  }));
+  body.querySelectorAll('.colorpick button').forEach(b => b.addEventListener('click', () => {
+    b.parentElement.querySelector('input[type=hidden]').value = b.dataset.color;
+    b.parentElement.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+  }));
+  const form = $('#sheetForm');
+  if (form) form.addEventListener('submit', onSheetSubmit);
+
+  const wrap = $('#sheetWrap');
+  wrap.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => wrap.classList.add('open')));
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { const f = body.querySelector('input[type=text], textarea'); if (f && !id) f.focus(); }, 280);
+}
+
+function closeSheet() {
+  const wrap = $('#sheetWrap');
+  $('#sheet').style.transform = '';
+  wrap.classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(() => { wrap.hidden = true; $('#sheet').style.transform = ''; }, 260);
+  sheetKind = null; sheetId = null;
+}
+
+function onSheetSubmit(e) {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const val = k => (f.get(k) || '').toString().trim();
+  if (sheetKind === 'event') {
+    const who = val('who') ? val('who').split(',').filter(Boolean) : [];
+    const data = { title: val('title'), date: val('date'), time: val('time') || '00:00', who, where: val('where'), address: val('address') };
+    if (!data.title || !data.date) return;
+    let id = sheetId;
+    if (id) Object.assign(state.events.find(x => x.id === id), data);
+    else { id = uid(); state.events.push({ id, ...data }); }
+    if (f.get('pinned')) state.featuredEventId = id; else if (state.featuredEventId === id) state.featuredEventId = null;
+    if (current === 'calendar') { calSel = data.date; calWeek = startOfWeek(parseDT(data.date)); }
+    toast(sheetId ? 'Event saved' : 'Event added');
+  } else if (sheetKind === 'chore') {
+    const data = { title: val('title'), who: val('who'), due: val('due'), repeat: val('repeat') || 'none' };
+    if (!data.title || !data.due) return;
+    if (sheetId) Object.assign(state.chores.find(x => x.id === sheetId), data);
+    else state.chores.push({ id: uid(), ...data, done: false });
+    toast(sheetId ? 'Chore saved' : 'Chore added');
+  } else if (sheetKind === 'note') {
+    const data = { text: val('text'), who: val('who'), color: val('color') || 'note-1', pinned: !!f.get('pinned') };
+    if (!data.text) return;
+    if (sheetId) Object.assign(state.notes.find(x => x.id === sheetId), data);
+    else state.notes.unshift({ id: uid(), ...data, at: Date.now() });
+    toast(sheetId ? 'Note saved' : 'Note posted');
+  }
+  save(); haptic(10); closeSheet(); render();
+}
+
+/* ---------- actions: every tappable thing has a data-act, handled in one place ---------- */
+let confirmTimer = null;
+function snapshot() { return JSON.stringify(state); }
+function restore(snap) { state = JSON.parse(snap); save(); render(); }
+
+function removeItem(type, id) {
+  const before = snapshot();
+  const list = { event: state.events, chore: state.chores, grocery: state.grocery, note: state.notes }[type];
+  const i = list.findIndex(x => x.id === id);
+  if (i < 0) return;
+  list.splice(i, 1);
+  if (type === 'event' && state.featuredEventId === id) state.featuredEventId = null;
+  save(); haptic(12); render();
+  toast(`${{ event: 'Event', chore: 'Chore', grocery: 'Item', note: 'Note' }[type]} deleted`, () => restore(before));
+}
+
+function toggleChore(id) {
+  const c = state.chores.find(x => x.id === id);
+  if (!c) return;
+  const before = snapshot();
+  c.done = !c.done;
+  c.doneAt = c.done ? Date.now() : null;
+  let msg = c.done ? 'Chore done' : 'Chore reopened';
+  // repeating chores come back on the next day / next week
+  if (c.done && c.repeat !== 'none') {
+    const base = c.due < isoDate(today()) ? today() : parseDT(c.due);   // an overdue chore restarts from today
+    const next = isoDate(addDays(base, c.repeat === 'daily' ? 1 : 7));
+    state.chores.push({ id: uid(), title: c.title, who: c.who, due: next, repeat: c.repeat, done: false });
+    const L = dayLabel(next);
+    msg = `Done · back ${L === 'Tomorrow' || L === 'Today' ? L.toLowerCase() : 'on ' + L}`;
+  }
+  save(); haptic(c.done ? 14 : 6); render();
+  toast(msg, () => restore(before));
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  switch (act) {
+    case 'tab': setTab(el.dataset.tab); break;
+    case 'open-sheet': openSheet(el.dataset.kind, id || null, { date: el.dataset.date }); break;
+    case 'toggle-chore': toggleChore(id); break;
+    case 'toggle-grocery': {
+      const g = state.grocery.find(x => x.id === id); if (!g) break;
+      g.done = !g.done; save(); haptic(g.done ? 12 : 6);
+      const row = el.closest('.row'); row.classList.add('leaving');
+      setTimeout(render, 200);
+      break;
+    }
+    case 'pin-event': {
+      state.featuredEventId = state.featuredEventId === id ? null : id;
+      save(); haptic(8); render();
+      toast(state.featuredEventId ? 'Countdown pinned' : 'Countdown follows the next event');
+      break;
+    }
+    case 'pin-note': { const n = state.notes.find(x => x.id === id); if (n) { n.pinned = !n.pinned; save(); haptic(8); render(); } break; }
+    case 'select-day': calSel = el.dataset.date; render(); break;
+    case 'week-prev': shiftWeek(-1); break;
+    case 'week-next': shiftWeek(1); break;
+    case 'week-today': calSel = isoDate(today()); calWeek = startOfWeek(today()); if (current !== 'calendar') setTab('calendar'); else render(); break;
+    case 'filter': choreFilter = id; render(); break;
+    case 'clear-done': { const before = snapshot(); state.chores = state.chores.filter(c => !c.done); save(); render(); toast('Done chores cleared', () => restore(before)); break; }
+    case 'clear-cart': { const before = snapshot(); state.grocery = state.grocery.filter(g => !g.done); save(); render(); toast('Cart cleared', () => restore(before)); break; }
+    case 'add-member': {
+      state.members.push({ id: uid(), name: '', color: MEMBER_COLORS[state.members.length % MEMBER_COLORS.length] });
+      save(); render();
+      const inputs = document.querySelectorAll('#screen-family [data-field=memberName]'); inputs[inputs.length - 1]?.focus();
+      break;
+    }
+    case 'remove-member': {
+      const before = snapshot(); const m = member(id);
+      state.members = state.members.filter(x => x.id !== id);
+      if (choreFilter === id) choreFilter = 'all';
+      save(); render(); toast(`${m?.name || 'Member'} removed`, () => restore(before));
+      break;
+    }
+    case 'member-color': { const m = member(id); if (m) { m.color = el.dataset.color; save(); render(); } break; }
+    case 'reset': case 'wipe': {
+      // two taps to do something big — no pop-up dialogs
+      if (el.dataset.armed) {
+        clearTimeout(confirmTimer);
+        state = act === 'reset' ? sampleData() : { familyName: state.familyName, members: state.members, events: [], chores: [], grocery: [], notes: [], featuredEventId: null };
+        save(); render(); toast(act === 'reset' ? 'Example data is back' : 'Everything cleared');
+      } else {
+        el.dataset.armed = '1'; el.dataset.label = el.textContent; el.textContent = el.dataset.confirm;
+        confirmTimer = setTimeout(() => { delete el.dataset.armed; el.textContent = el.dataset.label; }, 3000);
+      }
+      break;
+    }
+    case 'sheet-close': closeSheet(); break;
+    case 'sheet-delete': { const t = sheetKind, i = sheetId; closeSheet(); removeItem(t, i); break; }
+    /* Google services (section 8) */
+    case 'use-location': useMyLocation(); break;
+    case 'test-google': testGoogle(); break;
+    case 'refresh-weather': refreshWeather(true).then(() => { if (sheetKind === 'weather') $('#sheetBody').innerHTML = weatherSheet(); }); break;
+  }
+});
+
+// typing on the Family screen saves as you go
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.field === 'familyName') { state.familyName = el.value; save(); }
+  if (el.dataset.field === 'memberName') {
+    const m = member(el.dataset.id); if (!m) return;
+    m.name = el.value;
+    const av = el.closest('.member')?.querySelector('.av'); if (av) av.textContent = (m.name.trim()[0] || '?').toUpperCase();
+    save();
+  }
+  // the Google settings box saves as you type too
+  if (el.dataset.field === 'apiKey') { gset.apiKey = el.value.trim(); saveGoogleSettings(); updateGStatus(); }
+  if (el.dataset.field === 'homeAddress') { gset.homeAddress = el.value.trim(); saveGoogleSettings(); updateGStatus(); }
+  if (el.dataset.field === 'homeCoords') {
+    const m = el.value.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (m) { gset.lat = Number(m[1]); gset.lng = Number(m[2]); } else if (!el.value.trim()) { gset.lat = null; gset.lng = null; }
+    saveGoogleSettings(); updateGStatus();
+  }
+  if (el.dataset.field === 'unitsC') { gset.units = el.checked ? 'C' : 'F'; saveGoogleSettings(); refreshWeather(true).then(updateGStatus); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#sheetWrap').hidden) closeSheet();
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.row-face[role=checkbox]')) { e.preventDefault(); e.target.click(); }
+});
+
+/* ---------- 6. GESTURES ---------- */
+
+// Swipe a row: right = done, left = delete. The row's "face" slides over the colored action underneath.
+function enableSwipe(row, { onLeft, onRight }) {
+  const face = row.querySelector('.row-face');
+  let sx = 0, sy = 0, dx = 0, active = false, decided = false, pid = null;
+  face.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    sx = e.clientX; sy = e.clientY; dx = 0; active = true; decided = false; pid = e.pointerId;
+  });
+  face.addEventListener('pointermove', e => {
+    if (!active) return;
+    if (e.pointerType === 'mouse' && e.buttons === 0) { active = false; return; }
+    const mx = e.clientX - sx, my = e.clientY - sy;
+    if (!decided) {
+      if (Math.abs(mx) < 10 && Math.abs(my) < 10) return;     // not moved enough to know yet
+      if (Math.abs(my) > Math.abs(mx)) { active = false; return; } // mostly vertical → let the page scroll
+      decided = true; row.classList.add('swiping');
+      try { face.setPointerCapture(pid); } catch (err) {}
+    }
+    dx = Math.max(-140, Math.min(140, mx));
+    if (dx > 0 && !onRight) dx *= 0.25;   // a direction with no action only gives a little
+    if (dx < 0 && !onLeft) dx *= 0.25;
+    face.style.transform = `translateX(${dx}px)`;
+    row.classList.toggle('reveal-right', dx > 0);
+    row.classList.toggle('reveal-left', dx < 0);
+    const armed = Math.abs(dx) > 80;
+    if (armed && !row.classList.contains('armed')) haptic(6);
+    row.classList.toggle('armed', armed);
+  });
+  const end = () => {
+    if (!active) return;
+    active = false;
+    if (decided) { row.dataset.swiped = '1'; setTimeout(() => { delete row.dataset.swiped; }, 120); }
+    row.classList.remove('swiping');
+    if (dx > 80 && onRight) { face.style.transform = 'translateX(110%)'; setTimeout(onRight, 140); }
+    else if (dx < -80 && onLeft) { face.style.transform = 'translateX(-110%)'; setTimeout(onLeft, 140); }
+    else { face.style.transform = ''; row.classList.remove('armed', 'reveal-left', 'reveal-right'); }
+  };
+  face.addEventListener('pointerup', end);
+  face.addEventListener('pointercancel', end);
+  // a swipe should not also count as a tap
+  row.addEventListener('click', e => { if (row.dataset.swiped) { e.stopPropagation(); e.preventDefault(); } }, true);
+}
+
+// Long-press (hold half a second) on a note opens it for editing.
+function enableLongPress(el, fn) {
+  let t = null, sx = 0, sy = 0;
+  el.addEventListener('pointerdown', e => {
+    sx = e.clientX; sy = e.clientY;
+    t = setTimeout(() => { t = null; el.dataset.lp = '1'; haptic(15); fn(); setTimeout(() => { delete el.dataset.lp; }, 400); }, 500);
+  });
+  const cancel = () => { if (t) { clearTimeout(t); t = null; } };
+  el.addEventListener('pointermove', e => { if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) cancel(); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => el.addEventListener(ev, cancel));
+  el.addEventListener('contextmenu', e => e.preventDefault());
+  el.addEventListener('click', e => { if (el.dataset.lp) { e.stopPropagation(); e.preventDefault(); } }, true);
+}
+
+// after a screen is drawn, give its rows their gestures
+function wireRows(root) {
+  root.querySelectorAll('.row[data-swipe]').forEach(row => {
+    const type = row.dataset.type, id = row.dataset.id;
+    const opts = { onLeft: () => removeItem(type, id) };
+    if (type === 'chore') opts.onRight = () => toggleChore(id);
+    enableSwipe(row, opts);
+    if (row.hasAttribute('data-longpress')) enableLongPress(row, () => openSheet(type, id));
+  });
+}
+
+// Swipe the week strip sideways to move a week.
+function shiftWeek(n) {
+  calWeek = addDays(calWeek, 7 * n);
+  const t = today();
+  calSel = (startOfWeek(t).getTime() === calWeek.getTime()) ? isoDate(t) : isoDate(calWeek);
+  render();
+  const strip = $('#weekStrip'); if (strip) strip.classList.add(n > 0 ? 'slide-left' : 'slide-right');
+}
+function enableWeekSwipe(strip) {
+  if (!strip) return;
+  let sx = 0, sy = 0, pid = null, tracking = false;
+  strip.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; pid = e.pointerId; tracking = true; });
+  strip.addEventListener('pointermove', e => {
+    if (!tracking || e.pointerId !== pid) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) { tracking = false; shiftWeek(dx < 0 ? 1 : -1); }
+  });
+  ['pointerup', 'pointercancel'].forEach(ev => strip.addEventListener(ev, () => { tracking = false; }));
+}
+
+// Drag the sheet's handle down to close it.
+(function enableSheetDrag() {
+  const handle = $('#handle'), sheet = $('#sheet');
+  let sy = 0, dy = 0, on = false;
+  handle.addEventListener('pointerdown', e => { sy = e.clientY; dy = 0; on = true; sheet.classList.add('dragging'); handle.setPointerCapture(e.pointerId); });
+  handle.addEventListener('pointermove', e => { if (!on) return; dy = Math.max(0, e.clientY - sy); sheet.style.transform = `translate(-50%, ${dy}px)`; });
+  const end = () => { if (!on) return; on = false; sheet.classList.remove('dragging'); if (dy > 110) closeSheet(); else sheet.style.transform = ''; };
+  handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
+  $('#backdrop').addEventListener('click', closeSheet);
+})();
+
+/* ---------- 7. DYNAMISM ---------- */
+function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
+
+// The countdown updates four numbers once a second instead of redrawing the whole screen.
+function tickCountdown() {
+  const box = $('#countdown');
+  if (!box) return;
+  const target = Number(box.dataset.target);
+  const ms = target - Date.now();
+  const digits = $('#cdDigits'), now = $('#cdNow');
+  if (ms <= 0) {
+    if (ms < -3600e3) { renderToday(); return; }         // an hour after it started, move on to the next event
+    digits.hidden = true; now.hidden = false; return;
+  }
+  digits.hidden = false; now.hidden = true;
+  const d = Math.floor(ms / 86400e3), h = Math.floor(ms % 86400e3 / 3600e3), m = Math.floor(ms % 3600e3 / 60e3), s = Math.floor(ms % 60e3 / 1000);
+  $('#cd-d').textContent = pad(d); $('#cd-h').textContent = pad(h); $('#cd-m').textContent = pad(m); $('#cd-s').textContent = pad(s);
+}
+setInterval(() => { if (current === 'today') tickCountdown(); }, 1000);
+
+let toastTimer = null;
+function toast(msg, undo) {
+  const el = $('#toast');
+  el.innerHTML = `<span>${esc(msg)}</span>${undo ? '<button class="undo" type="button">Undo</button>' : ''}`;
+  if (undo) el.querySelector('.undo').addEventListener('click', () => { undo(); el.classList.remove('show'); haptic(8); });
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), undo ? 5000 : 2600);
+}
+
+// when the app comes back to the foreground (phone unlocked, tab switched back), refresh what's stale
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+
+/* =====================================================================
+   8. GOOGLE SERVICES — weather and drive times
+   Two web services from Google Maps Platform, called straight from the browser:
+     Weather API  https://weather.googleapis.com/v1/...   (current conditions, hourly and daily forecasts)
+     Routes API   https://routes.googleapis.com/directions/v2:computeRoutes   (drive time with traffic)
+   Both need an API key from Google Cloud. The key lives in this device's storage — never in this file —
+   so the code can be public while the key stays yours. Google should only accept the key from your
+   website's address (set "Website restrictions" on the key in Google Cloud).
+   Everything Google sends back is cached, so opening the app ten times costs one request, not ten.
+   ===================================================================== */
+const GSET_KEY = 'familyhub.google.v1';       // settings: key, home, units
+const GCACHE_KEY = 'familyhub.googlecache.v1'; // what Google told us, and when
+const WEATHER_TTL = 30 * 60e3;                // re-ask for weather after 30 minutes
+const ROUTE_TTL = 30 * 60e3;                  // re-ask for a drive time after 30 minutes...
+const ROUTE_TTL_SOON = 10 * 60e3;             // ...or 10 minutes when the event is within two hours
+const ERROR_TTL = 5 * 60e3;                   // after an error, wait 5 minutes before trying again
+const ROUTE_HORIZON = 7 * 86400e3;            // only ask about events in the next 7 days
+const ROUTE_MAX_PER_SYNC = 6;                 // never more than 6 drive-time requests per refresh
+
+let gset = loadJSON(GSET_KEY, { apiKey: '', homeAddress: '', lat: null, lng: null, units: 'F' });
+let gcache = loadJSON(GCACHE_KEY, { weather: null, routes: {} });
+const inflight = {};                          // requests already on their way, so nothing is asked twice
+
+function loadJSON(key, fallback) {
+  try { const raw = localStorage.getItem(key); if (raw) return { ...fallback, ...JSON.parse(raw) }; } catch (e) {}
+  return fallback;
+}
+function saveGoogleSettings() { try { localStorage.setItem(GSET_KEY, JSON.stringify(gset)); } catch (e) {} }
+function saveGoogleCache() {
+  // forget drive times for events that are already over
+  const cutoff = Date.now() - 86400e3;
+  for (const k of Object.keys(gcache.routes)) if ((gcache.routes[k].eventAt || 0) < cutoff) delete gcache.routes[k];
+  try { localStorage.setItem(GCACHE_KEY, JSON.stringify(gcache)); } catch (e) {}
+}
+function hasLoc() { return typeof gset.lat === 'number' && typeof gset.lng === 'number' && !Number.isNaN(gset.lat) && !Number.isNaN(gset.lng); }
+function hasHome() { return !!gset.homeAddress || hasLoc(); }
+function unitsSystem() { return gset.units === 'C' ? 'METRIC' : 'IMPERIAL'; }
+
+// A link like  https://your-site/family-hub/?key=AIza...  saves the key on this device, then hides it from the address bar.
+function importKeyFromUrl() {
+  try {
+    const url = new URL(location.href);
+    const k = url.searchParams.get('key');
+    if (!k) return;
+    gset.apiKey = k.trim(); saveGoogleSettings();
+    url.searchParams.delete('key');
+    history.replaceState(null, '', url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '') + url.hash);
+    setTimeout(() => toast('Google key saved on this device'), 400);
+  } catch (e) {}
+}
+
+// One function does every request. Google answers errors as JSON: { error: { code, message, status } }.
+async function googleFetch(url, init) {
+  let res;
+  try { res = await fetch(url, init); }
+  catch (e) { throw new Error('NETWORK'); }            // no internet, or this host blocks outside connections
+  let data = null;
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error((data && data.error && data.error.message) || `Google replied with error ${res.status}`);
+  return data;
+}
+// Turn Google's error text into a sentence that says what to do.
+function friendlyError(msg) {
+  msg = String(msg || '');
+  if (msg === 'NETWORK') return 'Couldn’t reach Google from this page. The copy on Claude can’t contact outside services — open the app from your own website address instead. Otherwise check the internet connection.';
+  if (/API key not valid|API_KEY_INVALID/i.test(msg)) return 'Google says this key isn’t valid. Check that the whole key was pasted, with no spaces.';
+  if (/referer|referrer/i.test(msg)) return 'Google refused this website. In the key’s settings under “Website restrictions”, add this site’s address (for example https://yourname.github.io/*).';
+  if (/has not been used|is disabled|not enabled/i.test(msg)) return 'That API isn’t turned on in your Google Cloud project yet. Enable it under APIs & Services → Library, then wait a minute.';
+  if (/billing/i.test(msg)) return 'Google Cloud needs a billing account on the project before it will answer (the monthly free amount still applies).';
+  if (/quota|RESOURCE_EXHAUSTED|rate limit/i.test(msg)) return 'You’ve reached the usage limit set in Google Cloud for today. It resets tomorrow, or raise the quota.';
+  if (/PERMISSION_DENIED|not authorized|blocked/i.test(msg)) return 'Google refused the request: ' + msg;
+  return msg;
+}
+
+/* --- weather --- */
+const WX_BASE = 'https://weather.googleapis.com/v1';
+
+function weatherQuery() {
+  return `key=${encodeURIComponent(gset.apiKey)}&location.latitude=${gset.lat}&location.longitude=${gset.lng}&unitsSystem=${unitsSystem()}`;
+}
+// Ask Google for the weather unless what we have is still fresh. Resolves when the cache is updated.
+function refreshWeather(force = false) {
+  if (!gset.apiKey || !hasLoc()) return Promise.resolve();
+  const loc = `${gset.lat},${gset.lng}`, units = gset.units;
+  const w = gcache.weather;
+  const same = w && w.loc === loc && w.units === units;
+  const fresh = same && w.current && Date.now() - w.at < WEATHER_TTL;
+  const failedRecently = same && w.error && Date.now() - (w.errorAt || 0) < ERROR_TTL;
+  if (!force && (fresh || failedRecently)) return Promise.resolve();
+  if (inflight.weather) return inflight.weather;
+  inflight.weather = (async () => {
+    const q = weatherQuery();
+    try {
+      // three answers, asked for at the same time: right now, the next 7 days, the next 48 hours
+      const [cur, days, hours] = await Promise.all([
+        googleFetch(`${WX_BASE}/currentConditions:lookup?${q}`),
+        googleFetch(`${WX_BASE}/forecast/days:lookup?${q}&days=7&pageSize=7`),
+        googleFetch(`${WX_BASE}/forecast/hours:lookup?${q}&hours=48&pageSize=48`).catch(() => null),   // hourly detail is a bonus; the daily forecast still works without it
+      ]);
+      gcache.weather = normalizeWeather(cur, days, hours, loc, units);
+    } catch (e) {
+      // keep yesterday's answer on screen, but remember that the refresh failed
+      gcache.weather = { ...(same ? w : { loc, units, at: 0 }), error: e.message, errorAt: Date.now() };
+    }
+    saveGoogleCache();
+    delete inflight.weather;
+    if (current === 'today' || current === 'calendar') render();
+    if (current === 'family') updateGStatus();
+  })();
+  return inflight.weather;
+}
+// Keep only what the app shows. Field names on the right are Google's; on the left are ours.
+function normalizeWeather(cur, days, hours, loc, units) {
+  const cond = c => ({ type: c?.weatherCondition?.type || '', text: c?.weatherCondition?.description?.text || '' });
+  const d0 = (days.forecastDays || [])[0];
+  const current = {
+    temp: cur.temperature?.degrees, feels: cur.feelsLikeTemperature?.degrees, ...cond(cur), isDay: cur.isDaytime !== false,
+    hum: cur.relativeHumidity, uv: cur.uvIndex, rain: cur.precipitation?.probability?.percent ?? 0,
+    wind: cur.wind?.speed?.value, windDir: cur.wind?.direction?.cardinal || '',
+    hi: d0?.maxTemperature?.degrees ?? cur.currentConditionsHistory?.maxTemperature?.degrees,
+    lo: d0?.minTemperature?.degrees ?? cur.currentConditionsHistory?.minTemperature?.degrees,
+    time: cur.currentTime,
+  };
+  const dayList = (days.forecastDays || []).map(d => ({
+    date: `${d.displayDate.year}-${pad(d.displayDate.month)}-${pad(d.displayDate.day)}`,
+    max: d.maxTemperature?.degrees, min: d.minTemperature?.degrees,
+    day: { ...cond(d.daytimeForecast), rain: d.daytimeForecast?.precipitation?.probability?.percent ?? 0 },
+    night: { ...cond(d.nighttimeForecast), rain: d.nighttimeForecast?.precipitation?.probability?.percent ?? 0 },
+    sunrise: d.sunEvents?.sunriseTime, sunset: d.sunEvents?.sunsetTime,
+  }));
+  const hourList = ((hours && hours.forecastHours) || []).map(h => ({
+    start: Date.parse(h.interval.startTime), end: Date.parse(h.interval.endTime),
+    temp: h.temperature?.degrees, ...cond(h), isDay: h.isDaytime !== false, rain: h.precipitation?.probability?.percent ?? 0,
+  }));
+  return { at: Date.now(), loc, units, current, days: dayList, hours: hourList, error: null, errorAt: 0 };
+}
+// Which icon for which sky. Google reports ~40 condition types; we draw nine.
+function wxIcon(type, isDay = true) {
+  const t = type || '';
+  if (/THUNDER/.test(t)) return 'wx-storm';
+  if (/SNOW|HAIL|BLOWING/.test(t)) return 'wx-snow';
+  if (/RAIN|SHOWER/.test(t)) return 'wx-rain';
+  if (t === 'WINDY') return 'wx-wind';
+  if (t === 'CLOUDY') return 'wx-cloud';
+  if (t === 'PARTLY_CLOUDY' || t === 'MOSTLY_CLOUDY') return isDay ? 'wx-partly' : 'wx-partly-night';
+  if (t === 'CLEAR' || t === 'MOSTLY_CLEAR') return isDay ? 'sun' : 'wx-moon';
+  return isDay ? 'wx-partly' : 'wx-cloud';
+}
+// The forecast for the hour of an event: from the hourly list when it's within 48h, else the day's forecast.
+function wxForEvent(e) {
+  const w = gcache.weather;
+  if (!w || !w.days || !w.days.length) return null;
+  const at = parseDT(e.date, e.time), ms = at.getTime();
+  if (ms < Date.now() - 3600e3) return null;                       // it already happened
+  const h = (w.hours || []).find(x => ms >= x.start && ms < x.end);
+  if (h && typeof h.temp === 'number') return { temp: h.temp, type: h.type, text: h.text, isDay: h.isDay, rain: h.rain, approx: false };
+  const d = w.days.find(x => x.date === e.date);
+  if (!d) return null;
+  const night = at.getHours() >= 19 || at.getHours() < 7;          // Google splits each day at 7 AM and 7 PM
+  const part = night ? d.night : d.day;
+  const temp = night ? d.min : d.max;
+  if (!part || typeof temp !== 'number') return null;
+  return { temp, type: part.type, text: part.text, isDay: !night, rain: part.rain, approx: true };
+}
+function wxPill(e) {
+  const w = wxForEvent(e);
+  if (!w) return '';
+  const rain = w.rain >= 30 ? ` <span style="opacity:.8">·</span> ${icon('drop')}${w.rain}%` : '';
+  return `<span class="pill wxp" title="${esc(w.text)}${w.approx ? ' (day forecast)' : ''}">${icon(wxIcon(w.type, w.isDay))}${Math.round(w.temp)}°${rain}</span>`;
+}
+function agoShort(ts) { const m = Math.round((Date.now() - ts) / 60e3); return m < 1 ? 'just now' : m < 60 ? `${m}m ago` : `${Math.round(m / 60)}h ago`; }
+
+// The strip at the top of Today. Every state explains itself and leads somewhere.
+function weatherStrip() {
+  const go = (title, body, glyph = 'wx-partly') => `<button class="wx wx-empty" data-act="tab" data-tab="family" aria-label="${esc(title)}"><span class="glyph">${icon(glyph)}</span><span class="grow"><span class="temp">${title}</span><span class="cond">${body}</span></span><span class="chev">${icon('right')}</span></button>`;
+  if (!gset.apiKey) return go('Add the weather', 'Paste your Google API key in Family settings');
+  if (!hasLoc()) return go('Where’s home?', 'Set a weather location in Family settings', 'nav');
+  const w = gcache.weather;
+  if (!w || !w.current) {
+    if (w && w.error) { const why = friendlyError(w.error); return go('Weather unavailable', esc(why.length > 90 ? why.slice(0, 90) + '…' : why), 'alert'); }
+    return `<div class="wx wx-empty" aria-busy="true"><span class="glyph">${icon('loader')}</span><span class="grow"><span class="temp">Checking the sky…</span><span class="cond">Asking Google for the weather</span></span></div>`;
+  }
+  const c = w.current;
+  const hi = typeof c.hi === 'number' ? `${Math.round(c.hi)}°` : '–', lo = typeof c.lo === 'number' ? `${Math.round(c.lo)}°` : '–';
+  const stale = w.error ? ' · offline' : '';
+  return `<button class="wx" data-act="open-sheet" data-kind="weather" aria-label="Weather: ${Math.round(c.temp)} degrees, ${esc(c.text)}. Tap for the forecast.">
+    <span class="glyph">${icon(wxIcon(c.type, c.isDay))}</span>
+    <span class="grow"><span class="temp">${Math.round(c.temp)}°</span><span class="cond">${esc(c.text)} · feels ${Math.round(c.feels)}°${stale}</span></span>
+    <span class="side">H <b>${hi}</b> L <b>${lo}</b><br>${icon('drop')} ${c.rain}% rain</span>
+  </button>`;
+}
+// The slide-up detail sheet: now, four numbers, seven days.
+function weatherSheet() {
+  const w = gcache.weather;
+  if (!w || !w.current) return `<h2 id="sheetTitle">Weather</h2><p style="color:var(--muted)">Nothing to show yet.</p>`;
+  const c = w.current, ts = isoDate(today());
+  const fmtT = iso => iso ? clock(Date.parse(iso)) : '–';
+  const windU = gset.units === 'C' ? 'km/h' : 'mph';
+  const rows = w.days.map(d => `<div class="wx-day">
+      <span class="dn${d.date === ts ? ' today' : ''}">${dayLabel(d.date) === 'Today' ? 'Today' : (daysFromToday(d.date) < 7 ? WD[parseDT(d.date).getDay()] : dayLabel(d.date))}</span>
+      ${icon(wxIcon(d.day.type, true))}
+      <span class="dc">${esc(d.day.text)}${d.day.rain >= 20 ? ` <small>· ${d.day.rain}% rain</small>` : ''}</span>
+      <span class="hl">${Math.round(d.max)}° <span>${Math.round(d.min)}°</span></span>
+    </div>`).join('');
+  const d0 = w.days.find(d => d.date === ts);
+  return `<h2 id="sheetTitle">Weather</h2>
+    <div class="wx-hero"><span class="glyph">${icon(wxIcon(c.type, c.isDay))}</span>
+      <div><div class="big">${Math.round(c.temp)}°</div><div class="txt">${esc(c.text)} · feels like ${Math.round(c.feels)}°</div></div></div>
+    <div class="wx-stats">
+      <div><b>${c.rain}%</b><span>Rain</span></div>
+      <div><b>${c.hum ?? '–'}%</b><span>Humidity</span></div>
+      <div><b>${typeof c.wind === 'number' ? Math.round(c.wind) : '–'}</b><span>${esc(windU)}${c.windDir ? ' ' + esc(c.windDir.replace(/NORTH/g, 'N').replace(/SOUTH/g, 'S').replace(/EAST/g, 'E').replace(/WEST/g, 'W').replace(/_/g, '')) : ''}</span></div>
+      <div><b>${c.uv ?? '–'}</b><span>UV index</span></div>
+    </div>
+    ${d0 && d0.sunrise ? `<p class="hint" style="margin-top:10px">Sunrise ${fmtT(d0.sunrise)} · Sunset ${fmtT(d0.sunset)}</p>` : ''}
+    <div class="wx-days">${rows}</div>
+    <div class="wx-foot"><span>Google Weather · updated ${agoShort(w.at)}${w.error ? ' · last refresh failed' : ''}</span><button class="link" data-act="refresh-weather">Refresh</button></div>`;
+}
+
+/* --- drive times --- */
+const ROUTES_URL = 'https://routes.googleapis.com/directions/v2:computeRoutes';
+
+function routeKey(e) { return `${gset.homeAddress || `${gset.lat},${gset.lng}`}|${e.address}|${e.date} ${e.time}`; }
+// Events worth asking about: in the future, within a week, with an address — nearest first.
+function routesNeeded() {
+  if (!gset.apiKey || !hasHome()) return [];
+  const now = Date.now();
+  return sortedEvents().filter(e => e.address && e.at.getTime() > now && e.at.getTime() - now < ROUTE_HORIZON).slice(0, ROUTE_MAX_PER_SYNC);
+}
+function refreshRoute(e, force = false) {
+  const k = routeKey(e), r = gcache.routes[k], at = parseDT(e.date, e.time).getTime();
+  const ttl = at - Date.now() < 2 * 3600e3 ? ROUTE_TTL_SOON : ROUTE_TTL;
+  if (!force && r && r.sec && Date.now() - r.at < ttl) return Promise.resolve();
+  if (!force && r && r.error && Date.now() - (r.errorAt || 0) < ERROR_TTL) return Promise.resolve();
+  if (inflight[k]) return inflight[k];
+  inflight[k] = (async () => {
+    // Ask for traffic as it will be shortly before the event (Google needs a departure time in the future).
+    const departure = new Date(Math.max(Date.now() + 2 * 60e3, at - 45 * 60e3)).toISOString();
+    const origin = gset.homeAddress ? { address: gset.homeAddress } : { location: { latLng: { latitude: gset.lat, longitude: gset.lng } } };
+    const body = { origin, destination: { address: e.address }, travelMode: 'DRIVE', routingPreference: 'TRAFFIC_AWARE', departureTime: departure };
+    try {
+      const data = await googleFetch(ROUTES_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': gset.apiKey, 'X-Goog-FieldMask': 'routes.duration,routes.staticDuration,routes.distanceMeters' },
+        body: JSON.stringify(body),
+      });
+      const route = (data.routes || [])[0];
+      if (!route) throw new Error('Google couldn’t find a driving route to that address.');
+      gcache.routes[k] = { at: Date.now(), eventAt: at, sec: parseInt(route.duration, 10) || 0, staticSec: parseInt(route.staticDuration, 10) || 0, meters: route.distanceMeters || 0, error: null };
+    } catch (err) {
+      gcache.routes[k] = { ...(r || { eventAt: at }), error: err.message, errorAt: Date.now() };
+    }
+    saveGoogleCache();
+    delete inflight[k];
+    if (current === 'today' || current === 'calendar') render();
+  })();
+  return inflight[k];
+}
+function distanceLabel(m) { return gset.units === 'C' ? `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km` : `${(m / 1609.344).toFixed(m < 16093 ? 1 : 0)} mi`; }
+// What we know about the drive to an event, in words: { min, leaveAt, label, tone } or null.
+function driveInfo(e) {
+  if (!e.address || !gset.apiKey || !hasHome()) return null;
+  const at = parseDT(e.date, e.time).getTime(), now = Date.now();
+  if (at < now || at - now > ROUTE_HORIZON) return null;
+  const r = gcache.routes[routeKey(e)];
+  if (!r || (!r.sec && !r.error)) return { tone: 'quiet', label: 'Checking drive…', min: null };
+  if (!r.sec) return { tone: 'quiet', label: 'No route found', min: null, error: r.error };
+  const min = Math.max(1, Math.round(r.sec / 60)), leaveAt = at - r.sec * 1000, untilLeave = leaveAt - now;
+  if (untilLeave <= 0) return { tone: 'danger', label: `Leave now · ${min} min drive`, min, leaveAt, meters: r.meters, stale: !!r.error };
+  if (untilLeave < 30 * 60e3) return { tone: 'sun', label: `Leave in ${Math.ceil(untilLeave / 60e3)} min · ${min} min drive`, min, leaveAt, meters: r.meters, stale: !!r.error };
+  return { tone: '', label: `Leave by ${clock(leaveAt)} · ${min} min drive`, min, leaveAt, meters: r.meters, stale: !!r.error };
+}
+function drivePill(e) {
+  const d = driveInfo(e);
+  if (!d) return '';
+  const short = d.min == null ? d.label : (d.tone === 'danger' ? `Leave now · ${d.min} min` : d.tone === 'sun' ? d.label.replace(' min drive', ' min') : `${d.min} min · leave ${clock(d.leaveAt)}`);
+  return `<span class="pill drive ${d.tone}" title="${esc(d.error || d.label)}">${icon('car')}${short}</span>`;
+}
+function driveLine(e) {      // the fuller version inside the countdown card
+  const d = driveInfo(e);
+  if (!d) return '';
+  const sub = d.min == null ? '' : `<span class="sub">${distanceLabel(d.meters)}${d.stale ? ' · offline' : ''}</span>`;
+  return `<div class="drive${d.tone === 'danger' ? ' late' : ''}">${icon('car')}<span>${esc(d.label)}</span>${sub}</div>`;
+}
+
+/* --- keeping things fresh, and the settings box --- */
+function syncGoogle() {
+  if (!gset.apiKey) return;
+  refreshWeather();
+  routesNeeded().forEach(e => refreshRoute(e));
+}
+function setGStatus(kind, text) {
+  const el = $('#gStatus'); if (!el) return;
+  el.className = 'gstatus' + (kind ? ' ' + kind : '');
+  const glyph = kind === 'ok' ? 'check-circle' : kind === 'bad' ? 'alert' : kind === 'busy' ? 'loader' : 'key';
+  el.innerHTML = `${icon(glyph)}<span>${text}</span>`;
+}
+function updateGStatus() {
+  if (!$('#gStatus')) return;
+  if (!gset.apiKey) return setGStatus('', 'No key yet. Paste your Google API key above to turn on weather and drive times.');
+  if (!hasLoc()) return setGStatus('', 'Key saved. Now set the weather location — tap “Use my location” or type coordinates.');
+  const w = gcache.weather;
+  if (w && w.current && !w.error) return setGStatus('ok', `Working. Weather updated ${agoShort(w.at)}${gset.homeAddress ? ' · drive times start from your home address' : ' · add a home address for drive times'}.`);
+  if (w && w.error) return setGStatus('bad', friendlyError(w.error));
+  setGStatus('', 'Ready to test. Tap “Test the connection” to ask Google for the weather.');
+}
+function useMyLocation() {
+  if (!navigator.geolocation) return setGStatus('bad', 'This browser can’t share its location. Type the coordinates instead (Google Maps → right-click a spot → the numbers at the top).');
+  setGStatus('busy', 'Asking this device for its location…');
+  navigator.geolocation.getCurrentPosition(p => {
+    gset.lat = Number(p.coords.latitude.toFixed(4)); gset.lng = Number(p.coords.longitude.toFixed(4));   // 4 decimals ≈ the block, not the doorstep
+    saveGoogleSettings();
+    const f = $('#gCoords'); if (f) f.value = `${gset.lat}, ${gset.lng}`;
+    setGStatus('ok', 'Weather location set.');
+    refreshWeather(true).then(updateGStatus);
+  }, err => {
+    setGStatus('bad', err.code === 1 ? 'Location permission was turned down. Allow it in the browser’s site settings, or type the coordinates.' : 'Couldn’t get a location right now. Try again, or type the coordinates.');
+  }, { timeout: 12000, maximumAge: 600e3 });
+}
+async function testGoogle() {
+  if (!gset.apiKey) return setGStatus('bad', 'Paste a key first.');
+  if (!hasLoc()) return setGStatus('bad', 'Set the weather location first.');
+  setGStatus('busy', 'Asking Google for the weather…');
+  await refreshWeather(true);
+  const w = gcache.weather;
+  if (!w || !w.current || w.error) return setGStatus('bad', friendlyError(w && w.error));
+  const ev = routesNeeded()[0];
+  if (!ev) return setGStatus('ok', `Weather works (${Math.round(w.current.temp)}°, ${w.current.text}). ${gset.homeAddress ? 'Add an address to an upcoming event to test drive times.' : 'Add a home address to turn on drive times.'}`);
+  setGStatus('busy', `Weather works. Now asking for the drive to “${esc(ev.title)}”…`);
+  await refreshRoute(ev, true);
+  const r = gcache.routes[routeKey(ev)];
+  if (r && r.sec) setGStatus('ok', `Everything works. ${Math.round(w.current.temp)}° and ${w.current.text}; the drive to “${esc(ev.title)}” is about ${Math.round(r.sec / 60)} min.`);
+  else setGStatus('bad', `Weather works, but the drive time didn’t: ${friendlyError(r && r.error)}`);
+}
+
+/* ---------- 9. BOOT ---------- */
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+$('#fab').addEventListener('click', () => { const fn = FAB_ACTIONS[current]; if (fn) fn(); });
+importKeyFromUrl();
+render();
+</script>
+
+</body>
+</html>
