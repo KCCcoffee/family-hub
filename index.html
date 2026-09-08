@@ -26,7 +26,7 @@
    5 Gestures     — swipe rows, long-press notes, drag the sheet closed
    6 Dynamism     — the countdown ticks, checks draw, tabs pop, toasts undo
    7 Empty states — an empty list explains itself and offers the next step
-   Plus two Google services: weather (Weather API) and drive times (Routes API).
+   Plus Google services: weather (Weather API), drive times and directions (Routes API), a route map (Maps JavaScript API).
    ===================================================================== */
 
 /* ---------- 2 SCALE: every size in the app comes from these tokens ---------- */
@@ -303,6 +303,25 @@ main { flex: 1; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
 .hint a { color: var(--accent); font-weight: 600; text-decoration: none; }
+/* directions inside an event's sheet: the drive, a Go button, the route map, the steps */
+.dirhead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.dirhead .big { font: 700 var(--t-2xl)/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.dirhead .late { color: var(--danger); }
+.routemap { height: 200px; border-radius: var(--r); overflow: hidden; background: var(--surface-2); margin-top: var(--s3); }
+.routemap .hint { padding: var(--s3); }
+.steps { list-style: none; margin: var(--s3) 0 0; padding: 0; border-top: 1px solid var(--line); counter-reset: step; }
+.steps li { display: flex; align-items: flex-start; gap: var(--s3); padding: 10px 4px; border-bottom: 1px solid var(--line); font-size: var(--t-sm); line-height: 1.35; }
+.steps li::before { counter-increment: step; content: counter(step); flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font: 600 12px/22px var(--font-body); text-align: center; }
+.steps li span { flex: 1; }
+.steps li .hint { flex: none; padding-top: 3px; }
+.count .drive { cursor: pointer; }
+.count .drive .chev { margin-left: 4px; opacity: .7; }
+.count .drive .chev svg.i { width: 18px; height: 18px; }
+.btn { text-decoration: none; }
+/* the Add-a-phone code */
+.qrbox { display: grid; place-items: center; padding: var(--s3); background: #fff; border-radius: var(--r); margin: var(--s2) 0; }
+.qrbox svg { width: 232px; height: 232px; display: block; }
+.pill.wxp.venue { background: var(--good-soft); color: var(--good); }
 
 /* ---------- Calendar ---------- */
 .weeknav { display: flex; align-items: center; justify-content: space-between; margin-top: var(--s2); }
@@ -450,6 +469,8 @@ textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
   <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8 20 3M16 7l2.5 2.5M13.5 9.5 16 12"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3zM12 10v4M12 17.5h.01"/></symbol>
   <symbol id="i-loader" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 1-6.4 2.6"/></symbol>
+  <symbol id="i-marker" viewBox="0 0 24 24"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></symbol>
 </svg>
 
 <div class="app" id="app">
@@ -483,6 +504,34 @@ textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- QR code drawing library (qrcode-generator 1.4.4 by Kazuhiko Arase, MIT licence), used only by "Add a phone" -->
+<script>
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n]
+;if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){
+n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f
+;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){
+for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",
+e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',
+l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){
+t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),
+u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){
+var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2
+},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e)
+;return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},
+o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}
+for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r
+;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){
+var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){
+var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e
+},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0)
+;if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){
+var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1
+;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2)
+;for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()
+},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o
+}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
 
 <script>
 /* =====================================================================
@@ -724,7 +773,7 @@ function renderToday() {
   if (ev) {
     const who = ev.who && ev.who.length ? avatars(ev.who) : '';
     const wx = wxForEvent(ev);   // the forecast for the hour of the event, if Google has one
-    const wxLine = wx ? ` · <span class="wxin">${icon(wxIcon(wx.type, wx.isDay))} ${Math.round(wx.temp)}° ${esc(wx.text)}</span>` : '';
+    const wxLine = wx ? ` · <span class="wxin" title="${wx.venue ? 'Forecast at the venue' : 'Forecast at home'}">${wx.venue ? icon('marker') : ''}${icon(wxIcon(wx.type, wx.isDay))} ${Math.round(wx.temp)}° ${esc(wx.text)}</span>` : '';
     count = `<section class="count" id="countdown" data-target="${ev.at.getTime()}" aria-label="Countdown to ${esc(ev.title)}">
       <div class="top"><p class="eyebrow">${pinned ? 'Pinned countdown' : 'Next up'}</p>
         <button class="iconbtn pinbtn pin${pinned ? ' on' : ''}" data-act="pin-event" data-id="${ev.id}" aria-label="${pinned ? 'Unpin this countdown' : 'Pin this countdown'}" aria-pressed="${pinned}">${icon('pin')}</button></div>
@@ -929,7 +978,12 @@ function renderFamily() {
       <label class="switch"><input type="checkbox" data-field="unitsC" ${gset.units === 'C' ? 'checked' : ''}><span class="knob"></span><span>Show °C and km instead of °F and miles</span></label>
       <div class="gstatus" id="gStatus"></div>
       <button class="btn btn-ghost" data-act="test-google">Test the connection</button>
-      <p class="hint">Drive times need the home address and an address on the event. Weather needs the location. The key is kept on this device only and is never sent anywhere but Google.</p>
+      <p class="hint">Drive times need the home address and an address on the event. Weather needs the location. The key is kept on this device only and is never sent anywhere but Google. A green pin on an event's weather means it's the forecast at the venue.</p>
+    </div>
+    <div class="sec"><h2>Family phones</h2></div>
+    <div class="gbox">
+      <p class="hint">Each phone keeps its own copy of the key and these settings. Hand them to another phone with a code it scans — no typing.</p>
+      <button class="btn btn-ghost" data-act="add-phone">${icon('phone')} Add a phone</button>
     </div>
     <div class="sec"><h2>Data</h2></div>
     <div class="danger-zone">
@@ -963,6 +1017,7 @@ function openSheet(kind, id = null, presets = {}) {
         <div class="field"><span class="lbl">Who</span>${whoChips('who', v.who || [], { multi: true })}</div>
         <div class="field"><label for="f-where">Where <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="f-where" type="text" name="where" value="${esc(v.where || '')}" placeholder="Lakeside fields" maxlength="40"></div>
         <div class="field"><label for="f-address">Address <span style="font-weight:400;color:var(--muted)">(optional · turns on the drive time)</span></label><input id="f-address" type="text" name="address" value="${esc(v.address || '')}" placeholder="1500 Lakeshore Dr, Knoxville, TN" maxlength="120" autocomplete="off"></div>
+        ${e && e.address ? `<div class="sec" style="margin-top:4px"><h2>Directions</h2></div><div id="dirBox">${directionsHtml(e)}</div>` : ''}
         <label class="switch"><input type="checkbox" name="pinned" ${e && state.featuredEventId === e.id ? 'checked' : ''}><span class="knob"></span><span>Feature in the countdown on Today</span></label>
         <div class="actions">${e ? `<button type="button" class="btn btn-danger" data-act="sheet-delete">Delete</button>` : ''}<button type="submit" class="btn btn-primary">${e ? 'Save' : 'Add event'}</button></div>
       </form>`;
@@ -990,8 +1045,11 @@ function openSheet(kind, id = null, presets = {}) {
       </form>`;
   } else if (kind === 'weather') {
     html = weatherSheet();                 // not a form — a read-only detail view (section 8)
+  } else if (kind === 'phone') {
+    html = phoneSheet();                   // the Add-a-phone code (section 8)
   }
   body.innerHTML = html;
+  if (kind === 'event' && id && $('#dirBox')) mountDirections(state.events.find(x => x.id === id));
 
   // chips inside the form: tap to pick a person / a color
   body.querySelectorAll('[data-who]').forEach(b => b.addEventListener('click', () => {
@@ -1156,6 +1214,13 @@ document.addEventListener('click', e => {
     case 'use-location': useMyLocation(); break;
     case 'test-google': testGoogle(); break;
     case 'refresh-weather': refreshWeather(true).then(() => { if (sheetKind === 'weather') $('#sheetBody').innerHTML = weatherSheet(); }); break;
+    case 'add-phone': openSheet('phone'); break;
+    case 'copy-setup': {
+      const link = setupLink();
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(() => toast('Link copied — send it to the other phone'), () => toast('Couldn’t copy — select the link and copy it by hand'));
+      else toast('Select the link and copy it by hand');
+      break;
+    }
   }
 });
 
@@ -1329,7 +1394,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) rend
    Everything Google sends back is cached, so opening the app ten times costs one request, not ten.
    ===================================================================== */
 const GSET_KEY = 'familyhub.google.v1';       // settings: key, home, units
-const GCACHE_KEY = 'familyhub.googlecache.v1'; // what Google told us, and when
+const GCACHE_KEY = 'familyhub.googlecache.v2'; // what Google told us, and when (v2: routes now carry their shape and steps)
 const WEATHER_TTL = 30 * 60e3;                // re-ask for weather after 30 minutes
 const ROUTE_TTL = 30 * 60e3;                  // re-ask for a drive time after 30 minutes...
 const ROUTE_TTL_SOON = 10 * 60e3;             // ...or 10 minutes when the event is within two hours
@@ -1338,7 +1403,7 @@ const ROUTE_HORIZON = 7 * 86400e3;            // only ask about events in the ne
 const ROUTE_MAX_PER_SYNC = 6;                 // never more than 6 drive-time requests per refresh
 
 let gset = loadJSON(GSET_KEY, { apiKey: '', homeAddress: '', lat: null, lng: null, units: 'F' });
-let gcache = loadJSON(GCACHE_KEY, { weather: null, routes: {} });
+let gcache = loadJSON(GCACHE_KEY, { weather: null, routes: {}, venues: {} });   // venues: forecasts at event locations, by "lat,lng"
 const inflight = {};                          // requests already on their way, so nothing is asked twice
 
 function loadJSON(key, fallback) {
@@ -1347,25 +1412,38 @@ function loadJSON(key, fallback) {
 }
 function saveGoogleSettings() { try { localStorage.setItem(GSET_KEY, JSON.stringify(gset)); } catch (e) {} }
 function saveGoogleCache() {
-  // forget drive times for events that are already over
+  // forget drive times for events that are already over, and venue forecasts nobody has asked about for a day
   const cutoff = Date.now() - 86400e3;
   for (const k of Object.keys(gcache.routes)) if ((gcache.routes[k].eventAt || 0) < cutoff) delete gcache.routes[k];
+  gcache.venues = gcache.venues || {};
+  for (const k of Object.keys(gcache.venues)) if ((gcache.venues[k].at || 0) < cutoff) delete gcache.venues[k];
   try { localStorage.setItem(GCACHE_KEY, JSON.stringify(gcache)); } catch (e) {}
 }
 function hasLoc() { return typeof gset.lat === 'number' && typeof gset.lng === 'number' && !Number.isNaN(gset.lat) && !Number.isNaN(gset.lng); }
 function hasHome() { return !!gset.homeAddress || hasLoc(); }
 function unitsSystem() { return gset.units === 'C' ? 'METRIC' : 'IMPERIAL'; }
 
-// A link like  https://your-site/family-hub/?key=AIza...  saves the key on this device, then hides it from the address bar.
-function importKeyFromUrl() {
+// Opening the app through an "Add a phone" code (…?setup=…) or a plain key link (…?key=AIza…) saves the
+// settings on this device, then hides them from the address bar.
+function importSetupFromUrl() {
   try {
     const url = new URL(location.href);
-    const k = url.searchParams.get('key');
-    if (!k) return;
-    gset.apiKey = k.trim(); saveGoogleSettings();
-    url.searchParams.delete('key');
+    const k = url.searchParams.get('key'), s = url.searchParams.get('setup');
+    if (!k && !s) return;
+    if (s) {
+      const json = decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
+      const p = JSON.parse(json);
+      if (typeof p.k === 'string') gset.apiKey = p.k.trim();
+      if (typeof p.h === 'string') gset.homeAddress = p.h;
+      if (typeof p.lat === 'number' && typeof p.lng === 'number') { gset.lat = p.lat; gset.lng = p.lng; }
+      if (p.u === 'C' || p.u === 'F') gset.units = p.u;
+    } else {
+      gset.apiKey = k.trim();
+    }
+    saveGoogleSettings();
+    url.searchParams.delete('key'); url.searchParams.delete('setup');
     history.replaceState(null, '', url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '') + url.hash);
-    setTimeout(() => toast('Google key saved on this device'), 400);
+    setTimeout(() => toast(s ? 'This phone is set up — weather and drive times are on' : 'Google key saved on this device'), 400);
   } catch (e) {}
 }
 
@@ -1395,8 +1473,18 @@ function friendlyError(msg) {
 /* --- weather --- */
 const WX_BASE = 'https://weather.googleapis.com/v1';
 
-function weatherQuery() {
-  return `key=${encodeURIComponent(gset.apiKey)}&location.latitude=${gset.lat}&location.longitude=${gset.lng}&unitsSystem=${unitsSystem()}`;
+function weatherQuery(lat = gset.lat, lng = gset.lng) {
+  return `key=${encodeURIComponent(gset.apiKey)}&location.latitude=${lat}&location.longitude=${lng}&unitsSystem=${unitsSystem()}`;
+}
+// Google hands the hourly forecast out 24 hours per page; two pages make the 48 hours the event pills use.
+async function fetchHours(q) {
+  let url = `${WX_BASE}/forecast/hours:lookup?${q}&hours=48&pageSize=24`, all = [];
+  for (let page = 0; page < 2 && url; page++) {
+    const data = await googleFetch(url);
+    all = all.concat(data.forecastHours || []);
+    url = data.nextPageToken ? `${WX_BASE}/forecast/hours:lookup?${q}&hours=48&pageSize=24&pageToken=${encodeURIComponent(data.nextPageToken)}` : null;
+  }
+  return { forecastHours: all };
 }
 // Ask Google for the weather unless what we have is still fresh. Resolves when the cache is updated.
 function refreshWeather(force = false) {
@@ -1415,7 +1503,7 @@ function refreshWeather(force = false) {
       const [cur, days, hours] = await Promise.all([
         googleFetch(`${WX_BASE}/currentConditions:lookup?${q}`),
         googleFetch(`${WX_BASE}/forecast/days:lookup?${q}&days=7&pageSize=7`),
-        googleFetch(`${WX_BASE}/forecast/hours:lookup?${q}&hours=48&pageSize=48`).catch(() => null),   // hourly detail is a bonus; the daily forecast still works without it
+        fetchHours(q).catch(() => null),   // hourly detail is a bonus; the daily forecast still works without it
       ]);
       gcache.weather = normalizeWeather(cur, days, hours, loc, units);
     } catch (e) {
@@ -1441,7 +1529,13 @@ function normalizeWeather(cur, days, hours, loc, units) {
     lo: d0?.minTemperature?.degrees ?? cur.currentConditionsHistory?.minTemperature?.degrees,
     time: cur.currentTime,
   };
-  const dayList = (days.forecastDays || []).map(d => ({
+  const { days: dayList, hours: hourList } = normalizeForecast(days, hours);
+  return { at: Date.now(), loc, units, current, days: dayList, hours: hourList, error: null, errorAt: 0 };
+}
+// The daily and hourly lists, trimmed to what the app shows (shared by home weather and venue weather).
+function normalizeForecast(days, hours) {
+  const cond = c => ({ type: c?.weatherCondition?.type || '', text: c?.weatherCondition?.description?.text || '' });
+  const dayList = ((days && days.forecastDays) || []).map(d => ({
     date: `${d.displayDate.year}-${pad(d.displayDate.month)}-${pad(d.displayDate.day)}`,
     max: d.maxTemperature?.degrees, min: d.minTemperature?.degrees,
     day: { ...cond(d.daytimeForecast), rain: d.daytimeForecast?.precipitation?.probability?.percent ?? 0 },
@@ -1452,7 +1546,36 @@ function normalizeWeather(cur, days, hours, loc, units) {
     start: Date.parse(h.interval.startTime), end: Date.parse(h.interval.endTime),
     temp: h.temperature?.degrees, ...cond(h), isDay: h.isDaytime !== false, rain: h.precipitation?.probability?.percent ?? 0,
   }));
-  return { at: Date.now(), loc, units, current, days: dayList, hours: hourList, error: null, errorAt: 0 };
+  return { days: dayList, hours: hourList };
+}
+
+/* --- weather at the venue: the route tells us where the event is, so ask Google about that spot too --- */
+const VENUE_MAX_PER_SYNC = 3;                 // never more than 3 venue forecasts per refresh
+function venueKey(end) { return `${end.lat.toFixed(3)},${end.lng.toFixed(3)}`; }   // 3 decimals ≈ 100 m — the same field, one forecast
+function refreshVenueWeather(end, force = false) {
+  if (!gset.apiKey || !end) return Promise.resolve();
+  const k = venueKey(end), v = (gcache.venues || (gcache.venues = {}))[k], units = gset.units;
+  const fresh = v && v.units === units && v.days && Date.now() - v.at < WEATHER_TTL;
+  const failedRecently = v && v.error && Date.now() - (v.errorAt || 0) < ERROR_TTL;
+  if (!force && (fresh || failedRecently)) return Promise.resolve();
+  const ik = 'venue:' + k;
+  if (inflight[ik]) return inflight[ik];
+  inflight[ik] = (async () => {
+    const q = weatherQuery(end.lat, end.lng);
+    try {
+      const [days, hours] = await Promise.all([
+        googleFetch(`${WX_BASE}/forecast/days:lookup?${q}&days=7&pageSize=7`),
+        fetchHours(q).catch(() => null),
+      ]);
+      gcache.venues[k] = { at: Date.now(), units, ...normalizeForecast(days, hours), error: null, errorAt: 0 };
+    } catch (e) {
+      gcache.venues[k] = { ...(v || { at: 0, units }), error: e.message, errorAt: Date.now() };
+    }
+    saveGoogleCache();
+    delete inflight[ik];
+    if (current === 'today' || current === 'calendar') render();
+  })();
+  return inflight[ik];
 }
 // Which icon for which sky. Google reports ~40 condition types; we draw nine.
 function wxIcon(type, isDay = true) {
@@ -1466,27 +1589,31 @@ function wxIcon(type, isDay = true) {
   if (t === 'CLEAR' || t === 'MOSTLY_CLEAR') return isDay ? 'sun' : 'wx-moon';
   return isDay ? 'wx-partly' : 'wx-cloud';
 }
-// The forecast for the hour of an event: from the hourly list when it's within 48h, else the day's forecast.
+// The forecast for the hour of an event — at the venue when the route has told us where that is, otherwise at home.
+// From the hourly list when the event is within 48h, else from the day's forecast.
 function wxForEvent(e) {
-  const w = gcache.weather;
+  const r = e.address ? gcache.routes[routeKey(e)] : null;
+  const venue = r && r.end && gcache.venues ? gcache.venues[venueKey(r.end)] : null;
+  const w = venue && venue.days && venue.days.length ? venue : gcache.weather;
   if (!w || !w.days || !w.days.length) return null;
   const at = parseDT(e.date, e.time), ms = at.getTime();
   if (ms < Date.now() - 3600e3) return null;                       // it already happened
   const h = (w.hours || []).find(x => ms >= x.start && ms < x.end);
-  if (h && typeof h.temp === 'number') return { temp: h.temp, type: h.type, text: h.text, isDay: h.isDay, rain: h.rain, approx: false };
+  if (h && typeof h.temp === 'number') return { temp: h.temp, type: h.type, text: h.text, isDay: h.isDay, rain: h.rain, approx: false, venue: w === venue };
   const d = w.days.find(x => x.date === e.date);
   if (!d) return null;
   const night = at.getHours() >= 19 || at.getHours() < 7;          // Google splits each day at 7 AM and 7 PM
   const part = night ? d.night : d.day;
   const temp = night ? d.min : d.max;
   if (!part || typeof temp !== 'number') return null;
-  return { temp, type: part.type, text: part.text, isDay: !night, rain: part.rain, approx: true };
+  return { temp, type: part.type, text: part.text, isDay: !night, rain: part.rain, approx: true, venue: w === venue };
 }
 function wxPill(e) {
   const w = wxForEvent(e);
   if (!w) return '';
   const rain = w.rain >= 30 ? ` <span style="opacity:.8">·</span> ${icon('drop')}${w.rain}%` : '';
-  return `<span class="pill wxp" title="${esc(w.text)}${w.approx ? ' (day forecast)' : ''}">${icon(wxIcon(w.type, w.isDay))}${Math.round(w.temp)}°${rain}</span>`;
+  const where = w.venue ? `${icon('marker')}` : '';
+  return `<span class="pill wxp${w.venue ? ' venue' : ''}" title="${esc(w.text)}${w.venue ? ' at the venue' : ' at home'}${w.approx ? ' (day forecast)' : ''}">${where}${icon(wxIcon(w.type, w.isDay))}${Math.round(w.temp)}°${rain}</span>`;
 }
 function agoShort(ts) { const m = Math.round((Date.now() - ts) / 60e3); return m < 1 ? 'just now' : m < 60 ? `${m}m ago` : `${Math.round(m / 60)}h ago`; }
 
@@ -1559,20 +1686,29 @@ function refreshRoute(e, force = false) {
     const origin = gset.homeAddress ? { address: gset.homeAddress } : { location: { latLng: { latitude: gset.lat, longitude: gset.lng } } };
     const body = { origin, destination: { address: e.address }, travelMode: 'DRIVE', routingPreference: 'TRAFFIC_AWARE', departureTime: departure };
     try {
+      // The field mask is the list of answers we want back. Google works out the whole route either way;
+      // we ask for the time, the time without traffic, the distance, the route's shape, the turn-by-turn steps
+      // and where the trip ends (so the weather can be looked up at the venue).
       const data = await googleFetch(ROUTES_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': gset.apiKey, 'X-Goog-FieldMask': 'routes.duration,routes.staticDuration,routes.distanceMeters' },
+        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': gset.apiKey, 'X-Goog-FieldMask': 'routes.duration,routes.staticDuration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.endLocation,routes.legs.steps.navigationInstruction.instructions,routes.legs.steps.distanceMeters,routes.legs.steps.staticDuration' },
         body: JSON.stringify(body),
       });
       const route = (data.routes || [])[0];
       if (!route) throw new Error('Google couldn’t find a driving route to that address.');
-      gcache.routes[k] = { at: Date.now(), eventAt: at, sec: parseInt(route.duration, 10) || 0, staticSec: parseInt(route.staticDuration, 10) || 0, meters: route.distanceMeters || 0, error: null };
+      const leg = (route.legs || [])[0] || {};
+      const end = leg.endLocation && leg.endLocation.latLng ? { lat: leg.endLocation.latLng.latitude, lng: leg.endLocation.latLng.longitude } : null;
+      const steps = (leg.steps || []).filter(s => s.navigationInstruction && s.navigationInstruction.instructions).map(s => ({ text: s.navigationInstruction.instructions, meters: s.distanceMeters || 0, sec: parseInt(s.staticDuration, 10) || 0 }));
+      gcache.routes[k] = { at: Date.now(), eventAt: at, sec: parseInt(route.duration, 10) || 0, staticSec: parseInt(route.staticDuration, 10) || 0, meters: route.distanceMeters || 0, polyline: (route.polyline && route.polyline.encodedPolyline) || '', end, steps, error: null };
     } catch (err) {
       gcache.routes[k] = { ...(r || { eventAt: at }), error: err.message, errorAt: Date.now() };
     }
     saveGoogleCache();
     delete inflight[k];
     if (current === 'today' || current === 'calendar') render();
+    if (sheetKind === 'event' && sheetId === e.id) mountDirections(e);   // the open event sheet gets its map and steps
+    const done = gcache.routes[k];
+    if (done && done.end) refreshVenueWeather(done.end);                  // weather where the event is, not just at home
   })();
   return inflight[k];
 }
@@ -1593,21 +1729,121 @@ function driveInfo(e) {
 function drivePill(e) {
   const d = driveInfo(e);
   if (!d) return '';
-  const short = d.min == null ? d.label : (d.tone === 'danger' ? `Leave now · ${d.min} min` : d.tone === 'sun' ? d.label.replace(' min drive', ' min') : `${d.min} min · leave ${clock(d.leaveAt)}`);
-  return `<span class="pill drive ${d.tone}" title="${esc(d.error || d.label)}">${icon('car')}${short}</span>`;
+  const r = gcache.routes[routeKey(e)];
+  const extra = r && r.sec && r.staticSec ? Math.round((r.sec - r.staticSec) / 60) : 0;
+  const mins = d.min == null ? '' : `${d.min}${extra >= 2 ? ` (+${extra})` : ''} min`;
+  const short = d.min == null ? d.label : (d.tone === 'danger' ? `Leave now · ${mins}` : d.tone === 'sun' ? `Leave in ${Math.ceil((d.leaveAt - Date.now()) / 60e3)} min · ${mins}` : `${mins} · leave ${clock(d.leaveAt)}`);
+  return `<span class="pill drive ${d.tone}" title="${esc(d.error || d.label)}${extra >= 2 ? ` (+${extra} min of traffic right now)` : ''}">${icon('car')}${short}</span>`;
 }
-function driveLine(e) {      // the fuller version inside the countdown card
+function driveLine(e) {      // the fuller version inside the countdown card — tap it for the map and directions
   const d = driveInfo(e);
   if (!d) return '';
-  const sub = d.min == null ? '' : `<span class="sub">${distanceLabel(d.meters)}${d.stale ? ' · offline' : ''}</span>`;
-  return `<div class="drive${d.tone === 'danger' ? ' late' : ''}">${icon('car')}<span>${esc(d.label)}</span>${sub}</div>`;
+  const sub = d.min == null ? '' : `<span class="sub">${distanceLabel(d.meters)}${trafficLabel(gcache.routes[routeKey(e)])}${d.stale ? ' · offline' : ''}</span>`;
+  return `<div class="drive${d.tone === 'danger' ? ' late' : ''}" data-act="open-sheet" data-kind="event" data-id="${e.id}" role="button" tabindex="0">${icon('car')}<span>${esc(d.label)}</span>${sub}<span class="chev">${icon('right')}</span></div>`;
+}
+// "+4 min traffic" when the drive is slower than usual right now (Google gives both numbers)
+function trafficLabel(r) {
+  if (!r || !r.sec || !r.staticSec) return '';
+  const extra = Math.round((r.sec - r.staticSec) / 60);
+  return extra >= 2 ? ` · +${extra} min traffic` : '';
+}
+
+/* --- directions: the Go button, the route map and the turn-by-turn steps, inside an event's sheet --- */
+function mapsLinks(e) {
+  const origin = gset.homeAddress || `${gset.lat},${gset.lng}`;
+  return {
+    google: `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(e.address)}&travelmode=driving`,
+    apple: `https://maps.apple.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(e.address)}&dirflg=d`,
+  };
+}
+function directionsHtml(e) {
+  if (!gset.apiKey || !hasHome()) return `<p class="hint">Add your Google key and home address in Family settings to get directions.</p>`;
+  const r = gcache.routes[routeKey(e)], d = driveInfo(e), links = mapsLinks(e);
+  const go = `<div class="actions" style="margin-top:8px"><a class="btn btn-primary" href="${links.google}" target="_blank" rel="noopener">${icon('nav')} Go</a><a class="btn btn-ghost" href="${links.apple}" target="_blank" rel="noopener">Apple Maps</a></div>`;
+  if (!d) return `<p class="hint">Directions appear during the week before the event.</p>${go}`;
+  const head = d.min == null
+    ? `<p class="hint">${esc(d.error ? friendlyError(d.error) : d.label)}</p>`
+    : `<div class="dirhead"><span class="big${d.tone === 'danger' ? ' late' : ''}">${d.min} min</span><span class="hint">${distanceLabel(d.meters)}${trafficLabel(r)} · ${d.tone === 'danger' ? 'leave now' : 'leave by ' + clock(d.leaveAt)}</span></div>`;
+  const map = `<div class="routemap" id="routeMap"><p class="hint">${r && r.polyline ? 'Loading the map…' : 'Getting the route…'}</p></div>`;
+  const steps = r && r.steps && r.steps.length ? `<ol class="steps">${r.steps.map(s => `<li><span>${esc(s.text)}</span><span class="hint">${distanceLabel(s.meters)}</span></li>`).join('')}</ol>` : '';
+  return head + go + map + steps;
+}
+async function mountDirections(e) {
+  if (!e || !e.address || !gset.apiKey || !hasHome()) return;
+  const at = parseDT(e.date, e.time).getTime();
+  if (at < Date.now() || at - Date.now() > ROUTE_HORIZON) return;
+  let r = gcache.routes[routeKey(e)];
+  if (!r || !r.polyline) {                       // older cache entries have no shape or steps — ask once more
+    await refreshRoute(e, true);
+    if (!(sheetKind === 'event' && sheetId === e.id)) return;
+    const box = $('#dirBox'); if (box) box.innerHTML = directionsHtml(e);
+    r = gcache.routes[routeKey(e)];
+  }
+  const el = $('#routeMap');
+  if (el && r && r.polyline) drawRouteMap(el, r);
+}
+// Google's map library is loaded the first time a map is needed, with the same key (Maps JavaScript API).
+let mapsReady = null;
+function loadGoogleMaps() {
+  if (window.google && google.maps && google.maps.importLibrary) return Promise.resolve();
+  if (mapsReady) return mapsReady;
+  mapsReady = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(gset.apiKey)}&v=weekly&loading=async&libraries=geometry&callback=__mapsLoaded`;
+    window.__mapsLoaded = () => resolve();
+    s.onerror = () => { mapsReady = null; reject(new Error('NETWORK')); };
+    document.head.appendChild(s);
+    setTimeout(() => reject(new Error('The map took too long to load.')), 15000);
+  });
+  return mapsReady;
+}
+async function drawRouteMap(el, r) {
+  try {
+    await loadGoogleMaps();
+    const path = google.maps.geometry.encoding.decodePath(r.polyline);
+    el.innerHTML = '';
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const map = new google.maps.Map(el, { disableDefaultUI: true, zoomControl: true, gestureHandling: 'cooperative', colorScheme: dark ? 'DARK' : 'LIGHT', clickableIcons: false });
+    new google.maps.Polyline({ path, map, strokeColor: '#2C4FD6', strokeOpacity: .9, strokeWeight: 5 });
+    const dot = (pos, color) => new google.maps.Marker({ position: pos, map, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 7, fillColor: color, fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 } });
+    dot(path[0], '#2C4FD6'); dot(path[path.length - 1], '#D34A3E');
+    const bounds = new google.maps.LatLngBounds(); path.forEach(p => bounds.extend(p)); map.fitBounds(bounds, 28);
+  } catch (e) {
+    el.innerHTML = `<p class="hint">The map couldn’t load. ${esc(friendlyError(e.message))}</p>`;
+  }
+}
+
+/* --- Add a phone: a code that carries the key and settings to another device --- */
+function setupLink() {
+  const p = { k: gset.apiKey, h: gset.homeAddress, lat: gset.lat, lng: gset.lng, u: gset.units };
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return `${location.origin}${location.pathname}?setup=${b64}`;
+}
+function phoneSheet() {
+  if (!gset.apiKey) return `<h2 id="sheetTitle">Add a phone</h2><p class="hint">Paste your Google API key first — then this screen can hand it to other phones.</p>`;
+  const link = setupLink();
+  let svg = '';
+  try { const qr = qrcode(0, 'M'); qr.addData(link); qr.make(); svg = qr.createSvgTag({ cellSize: 4, margin: 6, scalable: true }); } catch (e) { svg = ''; }
+  return `<h2 id="sheetTitle">Add a phone</h2>
+    <p class="hint">On the other phone, open its camera and point it at this code, then tap the link that pops up. The key, home address and weather location come across. Each phone still keeps its own lists.</p>
+    <div class="qrbox">${svg || '<p class="hint">The code couldn’t be drawn — use the link below instead.</p>'}</div>
+    <p class="hint mono" style="overflow-wrap:anywhere">${esc(link)}</p>
+    <div class="actions"><button type="button" class="btn btn-ghost" data-act="copy-setup">Copy link</button><button type="button" class="btn btn-primary" data-act="sheet-close">Done</button></div>
+    <p class="hint" style="margin-top:12px">Anyone with this code can use your key — but only on this website, and Google's daily ceiling caps it. Share it inside the family.</p>`;
 }
 
 /* --- keeping things fresh, and the settings box --- */
 function syncGoogle() {
   if (!gset.apiKey) return;
   refreshWeather();
-  routesNeeded().forEach(e => refreshRoute(e));
+  const needed = routesNeeded();
+  needed.forEach(e => refreshRoute(e));
+  // venue forecasts for the routes we already know the end of (new routes trigger their own when they arrive)
+  const seen = new Set();
+  needed.forEach(e => {
+    const r = gcache.routes[routeKey(e)];
+    if (r && r.end && seen.size < VENUE_MAX_PER_SYNC && !seen.has(venueKey(r.end))) { seen.add(venueKey(r.end)); refreshVenueWeather(r.end); }
+  });
 }
 function setGStatus(kind, text) {
   const el = $('#gStatus'); if (!el) return;
@@ -1656,7 +1892,7 @@ async function testGoogle() {
 /* ---------- 9. BOOT ---------- */
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
 $('#fab').addEventListener('click', () => { const fn = FAB_ACTIONS[current]; if (fn) fn(); });
-importKeyFromUrl();
+importSetupFromUrl();
 render();
 </script>
 
