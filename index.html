@@ -50,6 +50,7 @@
   --good: #23935F;  --good-soft: #DCF3E6;
   --warn: #C8690F;
   --danger: #D34A3E; --danger-soft: #FBE3E0;
+  --wet: #1E4FB0; --wet-soft: #D6E6FA;   /* rain nudges */
   --note-1: #FFE9A8; --note-2: #D3F1DF; --note-3: #D6E6FA; --note-4: #FBDCE0; --note-5: #E7DCF7;
   --shadow: 0 1px 2px rgba(27,29,37,.06), 0 10px 28px rgba(27,29,37,.10);
   --toast-bg: #1B1D25; --toast-ink: #F2F1EC; --toast-accent: #F7C453;
@@ -77,6 +78,7 @@
     --accent: #8AA0F5; --accent-ink: #0E1533; --accent-soft: #263058;
     --sun-a: #5E4614; --sun-b: #7C5A18; --sun-ink: #FFE7A8; --sun-cell: rgba(0,0,0,.28);
     --good: #4FCB8F; --good-soft: #163A27; --warn: #F19A5A; --danger: #F27F75; --danger-soft: #4A1F1C;
+    --wet: #9DBAF5; --wet-soft: #1F3358;
     --note-1: #4A3D12; --note-2: #173A2A; --note-3: #1B3150; --note-4: #4A2228; --note-5: #33264A;
     --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.45);
     --toast-bg: #F1F1F4; --toast-ink: #14161C; --toast-accent: #2C4FD6;
@@ -88,6 +90,7 @@
   --accent: #8AA0F5; --accent-ink: #0E1533; --accent-soft: #263058;
   --sun-a: #5E4614; --sun-b: #7C5A18; --sun-ink: #FFE7A8; --sun-cell: rgba(0,0,0,.28);
   --good: #4FCB8F; --good-soft: #163A27; --warn: #F19A5A; --danger: #F27F75; --danger-soft: #4A1F1C;
+  --wet: #9DBAF5; --wet-soft: #1F3358;
   --note-1: #4A3D12; --note-2: #173A2A; --note-3: #1B3150; --note-4: #4A2228; --note-5: #33264A;
   --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.45);
   --toast-bg: #F1F1F4; --toast-ink: #14161C; --toast-accent: #2C4FD6;
@@ -262,9 +265,11 @@ main { flex: 1; }
 .pill.drive.quiet { color: var(--muted); }
 .row-face .meta { flex-wrap: wrap; row-gap: 4px; }
 /* the "leave by" line inside the countdown card */
-.count .drive { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s3); padding: 10px 12px; border-radius: var(--r-sm); background: var(--sun-cell); font-size: var(--t-sm); font-weight: 600; }
+.count .drive { display: grid; grid-template-columns: 20px 1fr 18px; column-gap: var(--s2); align-items: center; margin-top: var(--s3); padding: 10px 12px; border-radius: var(--r-sm); background: var(--sun-cell); font-size: var(--t-sm); font-weight: 600; }
 .count .drive svg.i { width: 20px; height: 20px; }
-.count .drive .sub { font-weight: 500; opacity: .8; margin-left: auto; text-align: right; }
+.count .drive > svg.i:first-child { grid-column: 1; grid-row: 1 / span 2; }
+.count .drive > span { grid-column: 2; }
+.count .drive .sub { font-weight: 500; opacity: .8; font-size: 12px; }
 .count .drive.late { background: var(--danger); color: #fff; }
 .count .drive.late .sub { opacity: .9; }
 .count .when .wxin { white-space: nowrap; }
@@ -315,13 +320,29 @@ main { flex: 1; }
 .steps li span { flex: 1; }
 .steps li .hint { flex: none; padding-top: 3px; }
 .count .drive { cursor: pointer; }
-.count .drive .chev { margin-left: 4px; opacity: .7; }
+.count .drive .chev { grid-column: 3; grid-row: 1 / span 2; opacity: .7; display: grid; place-items: center; }
 .count .drive .chev svg.i { width: 18px; height: 18px; }
 .btn { text-decoration: none; }
 /* the Add-a-phone code */
 .qrbox { display: grid; place-items: center; padding: var(--s3); background: #fff; border-radius: var(--r); margin: var(--s2) 0; }
 .qrbox svg { width: 232px; height: 232px; display: block; }
 .pill.wxp.venue { background: var(--good-soft); color: var(--good); }
+/* rain nudges: a wet forecast for the event or the drive gets its own line, and the pill turns "wet" */
+.pill.wxp.wet { background: var(--wet-soft); color: var(--wet); }
+.count .nudge { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s2); padding: 8px 12px; border-radius: var(--r-sm); background: var(--sun-cell); font-size: var(--t-sm); }
+.count .nudge svg.i { width: 18px; height: 18px; flex: none; }
+.count .nudge b { font-weight: 600; }
+.count .nudge span { opacity: .85; }
+.nudge-row { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s2); padding: 8px 12px; border-radius: var(--r-sm); background: var(--wet-soft); color: var(--wet); font-size: var(--t-sm); }
+.nudge-row svg.i { width: 18px; height: 18px; flex: none; }
+/* address suggestions under the Address field (Google Places) */
+.field.suggest { position: relative; }
+.suggest-list { position: absolute; left: 0; right: 0; top: 100%; z-index: 5; margin: 4px 0 0; padding: 4px; list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); box-shadow: var(--shadow); max-height: 220px; overflow: auto; }
+.suggest-list li { padding: 9px 10px; border-radius: 8px; font-size: var(--t-sm); cursor: pointer; display: flex; flex-direction: column; gap: 1px; }
+.suggest-list li b { font-weight: 600; }
+.suggest-list li span { font-size: 12px; color: var(--muted); }
+.suggest-list li:hover, .suggest-list li.on { background: var(--surface-2); }
+.suggest-list .foot { font-size: 10px; color: var(--muted); padding: 4px 10px 2px; text-align: right; }
 
 /* ---------- Calendar ---------- */
 .weeknav { display: flex; align-items: center; justify-content: space-between; margin-top: var(--s2); }
@@ -543,7 +564,7 @@ var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n
    5. Sheets          — the slide-up form for adding and editing
    6. Gestures        — swipe, long-press and drag-to-close
    7. Dynamism        — the ticking countdown, toasts with Undo, haptics
-   8. Google services — weather (Weather API) and drive times (Routes API)
+   8. Google services — weather (Weather API), drive times and directions (Routes API, Maps), address suggestions (Places API)
    9. Boot            — wiring it all together when the page opens
    ===================================================================== */
 
@@ -787,6 +808,7 @@ function renderToday() {
       </div>
       <p class="now" id="cdNow" hidden>Happening now</p>
       ${driveLine(ev)}
+      ${nudgeLine(ev)}
     </section>`;
   } else {
     count = `<section class="count" aria-label="Countdown">
@@ -1009,15 +1031,15 @@ function openSheet(kind, id = null, presets = {}) {
   let html = '';
   if (kind === 'event') {
     const e = id ? state.events.find(x => x.id === id) : null;
-    const v = { title: '', date: presets.date || (current === 'calendar' ? calSel : isoDate(today())), time: '18:00', who: [], where: '', address: '', ...(e || {}) };
+    const v = { title: '', date: presets.date || (current === 'calendar' ? calSel : isoDate(today())), time: '18:00', who: [], where: '', address: '', placeId: '', ...(e || {}) };
     html = `<h2 id="sheetTitle">${e ? 'Edit event' : 'New event'}</h2>
       <form id="sheetForm">
         <div class="field"><label for="f-title">What</label><input id="f-title" type="text" name="title" value="${esc(v.title)}" placeholder="Soccer practice" maxlength="60" required></div>
         <div class="field"><span class="lbl">When</span><div class="two"><input type="date" name="date" value="${v.date}" aria-label="Date" required><input type="time" name="time" value="${v.time}" aria-label="Time"></div></div>
         <div class="field"><span class="lbl">Who</span>${whoChips('who', v.who || [], { multi: true })}</div>
         <div class="field"><label for="f-where">Where <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="f-where" type="text" name="where" value="${esc(v.where || '')}" placeholder="Lakeside fields" maxlength="40"></div>
-        <div class="field"><label for="f-address">Address <span style="font-weight:400;color:var(--muted)">(optional · turns on the drive time)</span></label><input id="f-address" type="text" name="address" value="${esc(v.address || '')}" placeholder="1500 Lakeshore Dr, Knoxville, TN" maxlength="120" autocomplete="off"></div>
-        ${e && e.address ? `<div class="sec" style="margin-top:4px"><h2>Directions</h2></div><div id="dirBox">${directionsHtml(e)}</div>` : ''}
+        <div class="field"><label for="f-address">Address <span style="font-weight:400;color:var(--muted)">(optional · turns on the drive time)</span></label><input id="f-address" type="text" name="address" value="${esc(v.address || '')}" placeholder="1500 Lakeshore Dr, Knoxville, TN" maxlength="120" autocomplete="off" autocapitalize="words" role="combobox" aria-autocomplete="list" aria-expanded="false"><input type="hidden" name="placeId" value="${esc(v.placeId || '')}"></div>
+        ${e && e.address ? `<div class="sec" style="margin-top:4px"><h2>Directions</h2></div><div id="dirBox">${directionsHtml(e)}</div>` : (e ? nudgeLine(e, { inCard: false }) : '')}
         <label class="switch"><input type="checkbox" name="pinned" ${e && state.featuredEventId === e.id ? 'checked' : ''}><span class="knob"></span><span>Feature in the countdown on Today</span></label>
         <div class="actions">${e ? `<button type="button" class="btn btn-danger" data-act="sheet-delete">Delete</button>` : ''}<button type="submit" class="btn btn-primary">${e ? 'Save' : 'Add event'}</button></div>
       </form>`;
@@ -1049,6 +1071,7 @@ function openSheet(kind, id = null, presets = {}) {
     html = phoneSheet();                   // the Add-a-phone code (section 8)
   }
   body.innerHTML = html;
+  if (kind === 'event') wireAddressSuggest(body);                       // Google's address suggestions under the Address field
   if (kind === 'event' && id && $('#dirBox')) mountDirections(state.events.find(x => x.id === id));
 
   // chips inside the form: tap to pick a person / a color
@@ -1094,7 +1117,7 @@ function onSheetSubmit(e) {
   const val = k => (f.get(k) || '').toString().trim();
   if (sheetKind === 'event') {
     const who = val('who') ? val('who').split(',').filter(Boolean) : [];
-    const data = { title: val('title'), date: val('date'), time: val('time') || '00:00', who, where: val('where'), address: val('address') };
+    const data = { title: val('title'), date: val('date'), time: val('time') || '00:00', who, where: val('where'), address: val('address'), placeId: val('address') ? val('placeId') : '' };
     if (!data.title || !data.date) return;
     let id = sheetId;
     if (id) Object.assign(state.events.find(x => x.id === id), data);
@@ -1385,9 +1408,11 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) rend
 
 /* =====================================================================
    8. GOOGLE SERVICES — weather and drive times
-   Two web services from Google Maps Platform, called straight from the browser:
+   Web services from Google Maps Platform, called straight from the browser:
      Weather API  https://weather.googleapis.com/v1/...   (current conditions, hourly and daily forecasts)
-     Routes API   https://routes.googleapis.com/directions/v2:computeRoutes   (drive time with traffic)
+     Routes API   https://routes.googleapis.com/directions/v2:computeRoutes   (drive time with traffic, the route, the steps)
+     Places API   https://places.googleapis.com/v1/places:autocomplete   (address suggestions while typing)
+     Maps JavaScript API — the route map inside an event, loaded only when needed
    Both need an API key from Google Cloud. The key lives in this device's storage — never in this file —
    so the code can be public while the key stays yours. Google should only accept the key from your
    website's address (set "Website restrictions" on the key in Google Cloud).
@@ -1611,9 +1636,70 @@ function wxForEvent(e) {
 function wxPill(e) {
   const w = wxForEvent(e);
   if (!w) return '';
+  const wet = rainForEvent(e);
   const rain = w.rain >= 30 ? ` <span style="opacity:.8">·</span> ${icon('drop')}${w.rain}%` : '';
   const where = w.venue ? `${icon('marker')}` : '';
-  return `<span class="pill wxp${w.venue ? ' venue' : ''}" title="${esc(w.text)}${w.venue ? ' at the venue' : ' at home'}${w.approx ? ' (day forecast)' : ''}">${where}${icon(wxIcon(w.type, w.isDay))}${Math.round(w.temp)}°${rain}</span>`;
+  return `<span class="pill wxp${w.venue ? ' venue' : ''}${wet ? ' wet' : ''}" title="${esc(w.text)}${w.venue ? ' at the venue' : ' at home'}${w.approx ? ' (day forecast)' : ''}${wet ? ' · ' + esc(wet.label) : ''}">${where}${icon(wxIcon(w.type, w.isDay))}${Math.round(w.temp)}°${rain}</span>`;
+}
+
+/* --- rain nudges: what a wet forecast means for the event, and for the drive to it --- */
+const RAIN_LIKELY = 50;                       // the chance (%) at which the app starts saying "rain likely"
+function hoursIn(list, from, to) { return (list || []).filter(x => x.end > from && x.start < to); }
+function wetKind(h) { const t = (h && h.type) || ''; return /THUNDER/.test(t) ? 'storm' : /SNOW|HAIL|BLOWING/.test(t) ? 'snow' : 'rain'; }
+// Is this hour (or day-part) wet enough to mention? Storms and snow count at a lower chance than plain rain.
+function isWet(h) { return !!h && (h.rain >= RAIN_LIKELY || (wetKind(h) !== 'rain' && h.rain >= 30)); }
+function wettest(hours) {                     // the worst hour in a window: storms first, then snow, then the highest rain chance
+  let worst = null;
+  for (const h of hours) { const score = (h.rain || 0) + { storm: 300, snow: 200, rain: 0 }[wetKind(h)]; if (!worst || score > worst.score) worst = { ...h, score }; }
+  return worst;
+}
+// The forecast that applies to the event itself (at the venue when we know it) and the one for the drive (from home).
+function forecastsFor(e) {
+  const r = e.address ? gcache.routes[routeKey(e)] : null;
+  const venue = r && r.end && gcache.venues ? gcache.venues[venueKey(r.end)] : null;
+  const home = gcache.weather;
+  return { r, home, event: venue && venue.days && venue.days.length ? venue : home };
+}
+// null when it looks dry; otherwise { kind, pct, at, where: 'event'|'drive', label, tip }.
+function rainForEvent(e) {
+  const at = parseDT(e.date, e.time).getTime();
+  if (at < Date.now() - 3600e3) return null;
+  const { r, home, event: wx } = forecastsFor(e);
+  if (!wx || !wx.days || !wx.days.length) return null;
+  const during = wettest(hoursIn(wx.hours, at, at + 2 * 3600e3));                 // the event: its first two hours
+  const drive = r && r.sec && home ? wettest(hoursIn(home.hours, at - r.sec * 1000 - 5 * 60e3, at)) : null;   // the drive there
+  let hit = isWet(during) ? { kind: wetKind(during), pct: during.rain, at: during.start, where: 'event' }
+          : isWet(drive) ? { kind: wetKind(drive), pct: drive.rain, at: drive.start, where: 'drive' } : null;
+  if (!hit && !hoursIn(wx.hours, at, at + 3600e3).length) {                          // beyond the hourly forecast: use the day's
+    const d = wx.days.find(x => x.date === e.date), hr = new Date(at).getHours();
+    const part = d && ((hr >= 19 || hr < 7) ? d.night : d.day);
+    if (isWet(part)) hit = { kind: wetKind(part), pct: part.rain, at, where: 'event', approx: true };
+  }
+  if (!hit) return null;
+  const what = { rain: 'Rain', storm: 'Thunderstorms', snow: 'Snow' }[hit.kind];
+  hit.label = hit.where === 'drive' ? `${what} likely on the drive (${hit.pct}%)` : `${what} likely${hit.approx ? '' : ' around ' + clock(hit.at)} (${hit.pct}%)`;
+  hit.tip = hit.kind === 'storm' ? 'Leave early and expect delays' : hit.kind === 'snow' ? 'Allow extra time' : (hit.where === 'drive' ? 'Leaving a little earlier' : 'Umbrella or a jacket');
+  return hit;
+}
+// Leave earlier when the drive itself looks wet: 15% of the drive for rain, 30% for storms or snow — at least 3 minutes, at most 20.
+function rainBuffer(e, r) {                   // → { sec, kind } or null
+  if (!r || !r.sec) return null;
+  const home = gcache.weather;
+  if (!home || !home.hours || !home.hours.length) return null;
+  const at = parseDT(e.date, e.time).getTime();
+  const h = wettest(hoursIn(home.hours, at - r.sec * 1000 - 5 * 60e3, at));
+  if (!isWet(h)) return null;
+  const kind = wetKind(h);
+  return { sec: Math.min(20 * 60, Math.max(3 * 60, Math.round(r.sec * (kind === 'rain' ? 0.15 : 0.3)))), kind };
+}
+// One line under the countdown, or under an event in its sheet: the nudge in words.
+function nudgeLine(e, { inCard = true } = {}) {
+  const n = rainForEvent(e);
+  if (!n) return '';
+  const glyph = icon(n.kind === 'storm' ? 'wx-storm' : n.kind === 'snow' ? 'wx-snow' : 'wx-rain');
+  return inCard
+    ? `<div class="nudge" role="note">${glyph}<div><b>${esc(n.label)}</b> <span>· ${esc(n.tip)}</span></div></div>`
+    : `<div class="nudge-row" role="note">${glyph}<div><b>${esc(n.label)}</b> · ${esc(n.tip)}</div></div>`;
 }
 function agoShort(ts) { const m = Math.round((Date.now() - ts) / 60e3); return m < 1 ? 'just now' : m < 60 ? `${m}m ago` : `${Math.round(m / 60)}h ago`; }
 
@@ -1667,7 +1753,9 @@ function weatherSheet() {
 /* --- drive times --- */
 const ROUTES_URL = 'https://routes.googleapis.com/directions/v2:computeRoutes';
 
-function routeKey(e) { return `${gset.homeAddress || `${gset.lat},${gset.lng}`}|${e.address}|${e.date} ${e.time}`; }
+function routeKey(e) { return `${gset.homeAddress || `${gset.lat},${gset.lng}`}|${e.placeId || e.address}|${e.date} ${e.time}`; }
+// Where the drive ends: the exact place picked from Google's suggestions when there is one, otherwise the typed address.
+function destinationOf(e) { return e.placeId ? { placeId: e.placeId } : { address: e.address }; }
 // Events worth asking about: in the future, within a week, with an address — nearest first.
 function routesNeeded() {
   if (!gset.apiKey || !hasHome()) return [];
@@ -1684,7 +1772,7 @@ function refreshRoute(e, force = false) {
     // Ask for traffic as it will be shortly before the event (Google needs a departure time in the future).
     const departure = new Date(Math.max(Date.now() + 2 * 60e3, at - 45 * 60e3)).toISOString();
     const origin = gset.homeAddress ? { address: gset.homeAddress } : { location: { latLng: { latitude: gset.lat, longitude: gset.lng } } };
-    const body = { origin, destination: { address: e.address }, travelMode: 'DRIVE', routingPreference: 'TRAFFIC_AWARE', departureTime: departure };
+    const body = { origin, destination: destinationOf(e), travelMode: 'DRIVE', routingPreference: 'TRAFFIC_AWARE', departureTime: departure };
     try {
       // The field mask is the list of answers we want back. Google works out the whole route either way;
       // we ask for the time, the time without traffic, the distance, the route's shape, the turn-by-turn steps
@@ -1721,11 +1809,16 @@ function driveInfo(e) {
   const r = gcache.routes[routeKey(e)];
   if (!r || (!r.sec && !r.error)) return { tone: 'quiet', label: 'Checking drive…', min: null };
   if (!r.sec) return { tone: 'quiet', label: 'No route found', min: null, error: r.error };
-  const min = Math.max(1, Math.round(r.sec / 60)), leaveAt = at - r.sec * 1000, untilLeave = leaveAt - now;
-  if (untilLeave <= 0) return { tone: 'danger', label: `Leave now · ${min} min drive`, min, leaveAt, meters: r.meters, stale: !!r.error };
-  if (untilLeave < 30 * 60e3) return { tone: 'sun', label: `Leave in ${Math.ceil(untilLeave / 60e3)} min · ${min} min drive`, min, leaveAt, meters: r.meters, stale: !!r.error };
-  return { tone: '', label: `Leave by ${clock(leaveAt)} · ${min} min drive`, min, leaveAt, meters: r.meters, stale: !!r.error };
+  // a wet drive moves "leave by" earlier (rainMin says by how much, so the screen can explain it)
+  const rb = rainBuffer(e, r), bufSec = rb ? rb.sec : 0, rainMin = Math.round(bufSec / 60);
+  const min = Math.max(1, Math.round(r.sec / 60)), leaveAt = at - (r.sec + bufSec) * 1000, untilLeave = leaveAt - now;
+  const base = { min, leaveAt, meters: r.meters, stale: !!r.error, rainMin, rainKind: rb ? rb.kind : '' };
+  if (untilLeave <= 0) return { tone: 'danger', label: `Leave now · ${min} min drive`, ...base };
+  if (untilLeave < 30 * 60e3) return { tone: 'sun', label: `Leave in ${Math.ceil(untilLeave / 60e3)} min · ${min} min drive`, ...base };
+  return { tone: '', label: `Leave by ${clock(leaveAt)} · ${min} min drive`, ...base };
 }
+// "· 5 min early for rain" — appended wherever the leave-by time is explained
+function rainMinLabel(d) { return d && d.rainMin ? ` · ${d.rainMin} min early for ${{ rain: 'rain', storm: 'storms', snow: 'snow' }[d.rainKind] || 'rain'}` : ''; }
 function drivePill(e) {
   const d = driveInfo(e);
   if (!d) return '';
@@ -1733,13 +1826,13 @@ function drivePill(e) {
   const extra = r && r.sec && r.staticSec ? Math.round((r.sec - r.staticSec) / 60) : 0;
   const mins = d.min == null ? '' : `${d.min}${extra >= 2 ? ` (+${extra})` : ''} min`;
   const short = d.min == null ? d.label : (d.tone === 'danger' ? `Leave now · ${mins}` : d.tone === 'sun' ? `Leave in ${Math.ceil((d.leaveAt - Date.now()) / 60e3)} min · ${mins}` : `${mins} · leave ${clock(d.leaveAt)}`);
-  return `<span class="pill drive ${d.tone}" title="${esc(d.error || d.label)}${extra >= 2 ? ` (+${extra} min of traffic right now)` : ''}">${icon('car')}${short}</span>`;
+  return `<span class="pill drive ${d.tone}" title="${esc(d.error || d.label)}${extra >= 2 ? ` (+${extra} min of traffic right now)` : ''}${esc(rainMinLabel(d))}">${icon('car')}${short}${d.rainMin ? icon('drop') : ''}</span>`;
 }
 function driveLine(e) {      // the fuller version inside the countdown card — tap it for the map and directions
   const d = driveInfo(e);
   if (!d) return '';
-  const sub = d.min == null ? '' : `<span class="sub">${distanceLabel(d.meters)}${trafficLabel(gcache.routes[routeKey(e)])}${d.stale ? ' · offline' : ''}</span>`;
-  return `<div class="drive${d.tone === 'danger' ? ' late' : ''}" data-act="open-sheet" data-kind="event" data-id="${e.id}" role="button" tabindex="0">${icon('car')}<span>${esc(d.label)}</span>${sub}<span class="chev">${icon('right')}</span></div>`;
+  const sub = d.min == null ? '' : `<span class="sub">${distanceLabel(d.meters)}${trafficLabel(gcache.routes[routeKey(e)])}${d.rainMin ? ` · +${d.rainMin} min ${d.rainKind === 'rain' ? 'rain' : d.rainKind}` : ''}${d.stale ? ' · offline' : ''}</span>`;
+  return `<div class="drive${d.tone === 'danger' ? ' late' : ''}" data-act="open-sheet" data-kind="event" data-id="${e.id}" role="button" tabindex="0" title="${esc(d.label + rainMinLabel(d))}">${icon('car')}<span>${esc(d.label)}</span>${sub}<span class="chev">${icon('right')}</span></div>`;
 }
 // "+4 min traffic" when the drive is slower than usual right now (Google gives both numbers)
 function trafficLabel(r) {
@@ -1752,7 +1845,7 @@ function trafficLabel(r) {
 function mapsLinks(e) {
   const origin = gset.homeAddress || `${gset.lat},${gset.lng}`;
   return {
-    google: `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(e.address)}&travelmode=driving`,
+    google: `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(e.address)}${e.placeId ? `&destination_place_id=${encodeURIComponent(e.placeId)}` : ''}&travelmode=driving`,
     apple: `https://maps.apple.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(e.address)}&dirflg=d`,
   };
 }
@@ -1763,10 +1856,10 @@ function directionsHtml(e) {
   if (!d) return `<p class="hint">Directions appear during the week before the event.</p>${go}`;
   const head = d.min == null
     ? `<p class="hint">${esc(d.error ? friendlyError(d.error) : d.label)}</p>`
-    : `<div class="dirhead"><span class="big${d.tone === 'danger' ? ' late' : ''}">${d.min} min</span><span class="hint">${distanceLabel(d.meters)}${trafficLabel(r)} · ${d.tone === 'danger' ? 'leave now' : 'leave by ' + clock(d.leaveAt)}</span></div>`;
+    : `<div class="dirhead"><span class="big${d.tone === 'danger' ? ' late' : ''}">${d.min} min</span><span class="hint">${distanceLabel(d.meters)}${trafficLabel(r)} · ${d.tone === 'danger' ? 'leave now' : 'leave by ' + clock(d.leaveAt)}${esc(rainMinLabel(d))}</span></div>`;
   const map = `<div class="routemap" id="routeMap"><p class="hint">${r && r.polyline ? 'Loading the map…' : 'Getting the route…'}</p></div>`;
   const steps = r && r.steps && r.steps.length ? `<ol class="steps">${r.steps.map(s => `<li><span>${esc(s.text)}</span><span class="hint">${distanceLabel(s.meters)}</span></li>`).join('')}</ol>` : '';
-  return head + go + map + steps;
+  return head + nudgeLine(e, { inCard: false }) + go + map + steps;
 }
 async function mountDirections(e) {
   if (!e || !e.address || !gset.apiKey || !hasHome()) return;
@@ -1830,6 +1923,61 @@ function phoneSheet() {
     <p class="hint mono" style="overflow-wrap:anywhere">${esc(link)}</p>
     <div class="actions"><button type="button" class="btn btn-ghost" data-act="copy-setup">Copy link</button><button type="button" class="btn btn-primary" data-act="sheet-close">Done</button></div>
     <p class="hint" style="margin-top:12px">Anyone with this code can use your key — but only on this website, and Google's daily ceiling caps it. Share it inside the family.</p>`;
+}
+
+/* --- address suggestions: as you type an event's address, Google (Places API) offers matching places nearby --- */
+const PLACES_URL = 'https://places.googleapis.com/v1/places:autocomplete';
+const SUGGEST_MIN = 3;                        // start suggesting at 3 characters
+const SUGGEST_DELAY = 350;                    // ...and only after a short pause in typing, so each address costs a handful of requests
+const suggestCache = {};                      // what Google said for each thing typed, for this visit
+let suggestTimer = null, suggestSeq = 0;
+
+async function fetchSuggestions(input) {
+  if (suggestCache[input]) return suggestCache[input];
+  const body = { input, includedRegionCodes: ['us'] };
+  if (hasLoc()) body.locationBias = { circle: { center: { latitude: gset.lat, longitude: gset.lng }, radius: 50000 } };   // prefer places within ~30 miles of home
+  const data = await googleFetch(PLACES_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': gset.apiKey }, body: JSON.stringify(body) });
+  const list = (data.suggestions || []).map(s => s.placePrediction).filter(p => p && p.placeId).map(p => ({
+    id: p.placeId, text: (p.text && p.text.text) || '',
+    main: (p.structuredFormat && p.structuredFormat.mainText && p.structuredFormat.mainText.text) || '',
+    sub: (p.structuredFormat && p.structuredFormat.secondaryText && p.structuredFormat.secondaryText.text) || '',
+  })).slice(0, 5);
+  suggestCache[input] = list;
+  return list;
+}
+function wireAddressSuggest(root) {
+  const inp = root.querySelector('#f-address'), pid = root.querySelector('input[name=placeId]');
+  if (!inp || !gset.apiKey) return;
+  const field = inp.closest('.field'); field.classList.add('suggest');
+  const list = document.createElement('ul'); list.className = 'suggest-list'; list.hidden = true; list.setAttribute('role', 'listbox'); field.appendChild(list);
+  let items = [], hi = -1;
+  const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); items = []; hi = -1; };
+  const draw = () => {
+    if (!items.length) return close();
+    list.innerHTML = items.map((s, i) => `<li role="option" data-i="${i}" class="${i === hi ? 'on' : ''}" aria-selected="${i === hi}"><b>${esc(s.main || s.text)}</b>${s.sub ? `<span>${esc(s.sub)}</span>` : ''}</li>`).join('') + '<li class="foot" aria-hidden="true">Suggestions by Google</li>';
+    list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+  };
+  const pick = s => { if (!s) return; inp.value = s.text; if (pid) pid.value = s.id; close(); haptic(6); };
+  inp.addEventListener('input', () => {
+    if (pid) pid.value = '';                   // typing again means the picked place no longer applies
+    const q = inp.value.trim();
+    clearTimeout(suggestTimer);
+    if (q.length < SUGGEST_MIN) return close();
+    const seq = ++suggestSeq;
+    suggestTimer = setTimeout(async () => {
+      try { const res = await fetchSuggestions(q); if (seq !== suggestSeq) return; items = res; hi = -1; draw(); }
+      catch (e) { close(); }                   // no suggestions is not an error worth showing — the typed address still works
+    }, SUGGEST_DELAY);
+  });
+  inp.addEventListener('keydown', e => {
+    if (list.hidden) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); hi = (hi + 1) % items.length; draw(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); hi = (hi - 1 + items.length) % items.length; draw(); }
+    else if (e.key === 'Enter') { e.preventDefault(); pick(items[hi >= 0 ? hi : 0]); }
+    else if (e.key === 'Escape') { e.stopPropagation(); close(); }
+  });
+  inp.addEventListener('blur', () => setTimeout(close, 150));
+  list.addEventListener('pointerdown', e => { const li = e.target.closest('li[data-i]'); if (!li) return; e.preventDefault(); pick(items[Number(li.dataset.i)]); });
 }
 
 /* --- keeping things fresh, and the settings box --- */
